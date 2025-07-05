@@ -137,15 +137,18 @@ backend:
 
   - task: "Collections CRUD operations"
     implemented: true
-    working: "needs_testing"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "needs_testing"
         agent: "main"
         comment: "Full CRUD for collections with image support and positioning"
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested all collection CRUD operations with authentication"
 
   - task: "Jewelry items CRUD operations"
     implemented: true

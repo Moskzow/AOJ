@@ -1176,7 +1176,9 @@ const JewelryApp = () => {
 
   const loadSiteConfig = async () => {
     try {
+      console.log('Cargando configuración del sitio...');
       const response = await axios.get(`${API}/config`);
+      console.log('Configuración cargada:', response.data);
       setSiteConfig(response.data);
     } catch (error) {
       console.error('Error loading site config:', error);

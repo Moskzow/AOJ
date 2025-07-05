@@ -309,13 +309,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Authentication system with JWT"
-    - "Site configuration management"
-    - "Collections CRUD operations"
-    - "Jewelry items CRUD operations"
-    - "Demo data initialization"
+    - "Fix editConfig state initialization bug"
+    - "Random admin button positioning"
+    - "Hidden admin zone with 30-second timer"
+    - "Authentication context and login modal"
+    - "Elegant jewelry catalog UI with responsive design"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:

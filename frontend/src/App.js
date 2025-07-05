@@ -1369,7 +1369,7 @@ const JewelryApp = () => {
           <ScrollReveal direction="up" delay={1200}>
             <div className="hero-cta">
               <button 
-                className="cta-button clickable"
+                className="cta-button"
                 onClick={() => document.getElementById('collections').scrollIntoView({ behavior: 'smooth' })}
               >
                 Explorar Colecciones

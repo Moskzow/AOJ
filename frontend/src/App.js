@@ -70,14 +70,36 @@ const CustomCursor = () => {
       setIsVisible(true);
     };
 
+    // Función helper para verificar si un elemento es interactivo
+    const isInteractiveElement = (element) => {
+      if (!element) return false;
+      
+      const tagName = element.tagName?.toLowerCase();
+      const hasClickableClass = element.className && (
+        element.className.includes('clickable') ||
+        element.className.includes('collection-card-elegant') ||
+        element.className.includes('jewelry-card-elegant') ||
+        element.className.includes('cta-button') ||
+        element.className.includes('btn-') ||
+        element.className.includes('admin-access-btn')
+      );
+      
+      return tagName === 'button' || 
+             tagName === 'a' || 
+             hasClickableClass ||
+             element.onclick !== null ||
+             element.getAttribute('role') === 'button' ||
+             element.style.cursor === 'pointer';
+    };
+
     const handleMouseEnter = (e) => {
-      if (e.target.matches('button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-button')) {
+      if (isInteractiveElement(e.target)) {
         setIsHovering(true);
       }
     };
     
     const handleMouseLeave = (e) => {
-      if (e.target.matches('button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-button')) {
+      if (isInteractiveElement(e.target)) {
         setIsHovering(false);
       }
     };
@@ -94,18 +116,19 @@ const CustomCursor = () => {
       }
     };
 
+    // Event listeners
     window.addEventListener('mousemove', updatePosition);
     window.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
-    document.addEventListener('mouseenter', handleMouseEnter, true);
-    document.addEventListener('mouseleave', handleMouseLeave, true);
+    document.addEventListener('mouseover', handleMouseEnter, true);
+    document.addEventListener('mouseout', handleMouseLeave, true);
 
     return () => {
       window.removeEventListener('mousemove', updatePosition);
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('mouseenter', handleMouseEnter, true);
-      document.removeEventListener('mouseleave', handleMouseLeave, true);
+      document.removeEventListener('mouseover', handleMouseEnter, true);
+      document.removeEventListener('mouseout', handleMouseLeave, true);
     };
   }, [isHovering]);
 

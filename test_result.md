@@ -301,3 +301,5 @@ agent_communication:
     message: "Completed backend testing for all required endpoints. All tests are passing successfully. Authentication, site configuration, collections CRUD, jewelry items CRUD, and demo data initialization are all working as expected. MongoDB connectivity is confirmed through successful data operations."
   - agent: "testing"
     message: "Tested admin panel save functionality. Authentication, site configuration updates, collections CRUD, and jewelry items CRUD operations are all working correctly. The image editor save endpoint has an issue in the backend implementation - it returns a 404 error even when valid IDs are provided. All other save operations are working as expected."
+  - agent: "main"
+    message: "USER FEEDBACK: Admin access button is visible on page load (should be hidden). Need to implement random positioning (left/right side) for admin button after timer completion. Also need to fix editConfig state initialization bug that prevents saving configuration changes."

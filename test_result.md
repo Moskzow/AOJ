@@ -167,15 +167,18 @@ backend:
 
   - task: "Demo data initialization"
     implemented: true
-    working: "needs_testing"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "needs_testing"
         agent: "main"
         comment: "Demo data endpoint with 3 collections and 15 jewelry items (5 per collection)"
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested demo data initialization and verified collections were created"
 
 frontend:
   - task: "Elegant jewelry catalog UI with responsive design"

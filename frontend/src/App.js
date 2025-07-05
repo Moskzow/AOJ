@@ -316,58 +316,84 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
   };
 
   const saveCollection = async (collection) => {
+    if (isSaving) return;
+    setIsSaving(true);
+    
     try {
+      console.log('Guardando colección:', collection);
+      
       if (collection.id) {
-        await axios.put(`${API}/collections/${collection.id}`, collection);
+        const response = await axios.put(`${API}/collections/${collection.id}`, collection);
+        console.log('Colección actualizada:', response.data);
       } else {
-        await axios.post(`${API}/collections`, collection);
+        const response = await axios.post(`${API}/collections`, collection);
+        console.log('Colección creada:', response.data);
       }
-      onCollectionsUpdate();
+      
+      await onCollectionsUpdate();
       setEditingCollection(null);
       setNewCollection({ name: '', description: '', image_base64: '', position: 0 });
       alert('Colección guardada exitosamente');
     } catch (error) {
-      alert('Error al guardar colección');
+      console.error('Error al guardar colección:', error);
+      alert(`Error al guardar colección: ${error.response?.data?.detail || error.message}`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const deleteCollection = async (id) => {
     if (window.confirm('¿Estás seguro de eliminar esta colección y todas sus joyas?')) {
       try {
+        console.log('Eliminando colección:', id);
         await axios.delete(`${API}/collections/${id}`);
-        onCollectionsUpdate();
-        onJewelryUpdate();
+        await onCollectionsUpdate();
+        await onJewelryUpdate();
         alert('Colección eliminada exitosamente');
       } catch (error) {
-        alert('Error al eliminar colección');
+        console.error('Error al eliminar colección:', error);
+        alert(`Error al eliminar colección: ${error.response?.data?.detail || error.message}`);
       }
     }
   };
 
   const saveJewelry = async (jewelry) => {
+    if (isSaving) return;
+    setIsSaving(true);
+    
     try {
+      console.log('Guardando joya:', jewelry);
+      
       if (jewelry.id) {
-        await axios.put(`${API}/jewelry-items/${jewelry.id}`, jewelry);
+        const response = await axios.put(`${API}/jewelry-items/${jewelry.id}`, jewelry);
+        console.log('Joya actualizada:', response.data);
       } else {
-        await axios.post(`${API}/jewelry-items`, jewelry);
+        const response = await axios.post(`${API}/jewelry-items`, jewelry);
+        console.log('Joya creada:', response.data);
       }
-      onJewelryUpdate();
+      
+      await onJewelryUpdate();
       setEditingJewelry(null);
       setNewJewelry({ name: '', description: '', image_base64: '', collection_id: '', position: 0 });
       alert('Joya guardada exitosamente');
     } catch (error) {
-      alert('Error al guardar joya');
+      console.error('Error al guardar joya:', error);
+      alert(`Error al guardar joya: ${error.response?.data?.detail || error.message}`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const deleteJewelry = async (id) => {
     if (window.confirm('¿Estás seguro de eliminar esta joya?')) {
       try {
+        console.log('Eliminando joya:', id);
         await axios.delete(`${API}/jewelry-items/${id}`);
-        onJewelryUpdate();
+        await onJewelryUpdate();
         alert('Joya eliminada exitosamente');
       } catch (error) {
-        alert('Error al eliminar joya');
+        console.error('Error al eliminar joya:', error);
+        alert(`Error al eliminar joya: ${error.response?.data?.detail || error.message}`);
       }
     }
   };

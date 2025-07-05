@@ -217,6 +217,30 @@ frontend:
         agent: "main"
         comment: "Hidden zone in configurable position with timer-based visibility"
 
+  - task: "Random admin button positioning"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "Need to implement random positioning (left/right side) for admin button after timer completion"
+
+  - task: "Fix editConfig state initialization bug"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "editConfig initializes as empty object instead of siteConfig data, preventing configuration saves"
+
   - task: "3 color scheme system (gold, silver, rose)"
     implemented: true
     working: "needs_testing"

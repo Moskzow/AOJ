@@ -1267,6 +1267,10 @@ const JewelryApp = () => {
       setIsTimerActive(true);
       setHiddenClicks(0); // Reset counter
       
+      // Generar posición aleatoria para el botón (izquierda o derecha)
+      const randomSide = Math.random() < 0.5 ? 'left' : 'right';
+      setRandomButtonPosition(randomSide);
+      
       // Feedback visual/haptic
       if (navigator.vibrate) {
         navigator.vibrate(200); // Vibración en móviles

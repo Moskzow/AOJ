@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext, useRef } from 'react';
 import './App.css';
 import axios from 'axios';
 
@@ -57,16 +57,57 @@ const useAuth = () => {
   return context;
 };
 
+// Cursor personalizado
+const CustomCursor = () => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  useEffect(() => {
+    const updatePosition = (e) => {
+      setPosition({ x: e.clientX, y: e.clientY });
+    };
+
+    const handleMouseEnter = () => setIsHovering(true);
+    const handleMouseLeave = () => setIsHovering(false);
+
+    window.addEventListener('mousemove', updatePosition);
+    
+    const hoverElements = document.querySelectorAll('button, a, .clickable');
+    hoverElements.forEach(el => {
+      el.addEventListener('mouseenter', handleMouseEnter);
+      el.addEventListener('mouseleave', handleMouseLeave);
+    });
+
+    return () => {
+      window.removeEventListener('mousemove', updatePosition);
+      hoverElements.forEach(el => {
+        el.removeEventListener('mouseenter', handleMouseEnter);
+        el.removeEventListener('mouseleave', handleMouseLeave);
+      });
+    };
+  }, []);
+
+  return (
+    <div 
+      className={`custom-cursor ${isHovering ? 'hovering' : ''}`}
+      style={{ left: position.x, top: position.y }}
+    />
+  );
+};
+
 // Componente de Login
 const LoginModal = ({ isOpen, onClose }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const result = await login(username, password);
+    setIsLoading(false);
     if (result.success) {
       onClose();
     } else {
@@ -77,42 +118,46 @@ const LoginModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Panel de Administración</h2>
-        {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Usuario</label>
+    <div className="modal-backdrop">
+      <div className="modal-content login-modal">
+        <h2 className="modal-title">Panel de Administración</h2>
+        {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="form-group">
+            <label>Usuario</label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="form-input"
               required
+              disabled={isLoading}
             />
           </div>
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+          <div className="form-group">
+            <label>Contraseña</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="form-input"
               required
+              disabled={isLoading}
             />
           </div>
-          <div className="flex gap-4">
+          <div className="form-actions">
             <button
               type="submit"
-              className="flex-1 bg-amber-600 text-white py-2 px-4 rounded hover:bg-amber-700 transition-colors"
+              className={`btn-primary ${isLoading ? 'loading' : ''}`}
+              disabled={isLoading}
             >
-              Acceder
+              {isLoading ? 'Accediendo...' : 'Acceder'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition-colors"
+              className="btn-secondary"
+              disabled={isLoading}
             >
               Cancelar
             </button>
@@ -123,88 +168,466 @@ const LoginModal = ({ isOpen, onClose }) => {
   );
 };
 
-// Componente Editor de Imágenes
-const ImageEditor = ({ imageBase64, onSave, onClose }) => {
-  const [editedImage, setEditedImage] = useState(imageBase64);
-  const [brightness, setBrightness] = useState(100);
-  const [contrast, setContrast] = useState(100);
-  const [saturation, setSaturation] = useState(100);
+// Panel de Administración Completo
+const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, onCollectionsUpdate, jewelryItems, onJewelryUpdate }) => {
+  const [activeTab, setActiveTab] = useState('config');
+  const [editConfig, setEditConfig] = useState(siteConfig || {});
+  const [editingCollection, setEditingCollection] = useState(null);
+  const [editingJewelry, setEditingJewelry] = useState(null);
+  const [newCollection, setNewCollection] = useState({ name: '', description: '', image_base64: '', position: 0 });
+  const [newJewelry, setNewJewelry] = useState({ name: '', description: '', image_base64: '', collection_id: '', position: 0 });
 
-  const applyFilters = () => {
-    return {
-      filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`
-    };
+  const handleImageUpload = (e, callback) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        callback(event.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
+  const saveConfig = async () => {
+    try {
+      await axios.put(`${API}/config`, editConfig);
+      onConfigUpdate();
+      alert('Configuración guardada exitosamente');
+    } catch (error) {
+      alert('Error al guardar configuración');
+    }
+  };
+
+  const saveCollection = async (collection) => {
+    try {
+      if (collection.id) {
+        await axios.put(`${API}/collections/${collection.id}`, collection);
+      } else {
+        await axios.post(`${API}/collections`, collection);
+      }
+      onCollectionsUpdate();
+      setEditingCollection(null);
+      setNewCollection({ name: '', description: '', image_base64: '', position: 0 });
+      alert('Colección guardada exitosamente');
+    } catch (error) {
+      alert('Error al guardar colección');
+    }
+  };
+
+  const deleteCollection = async (id) => {
+    if (window.confirm('¿Estás seguro de eliminar esta colección y todas sus joyas?')) {
+      try {
+        await axios.delete(`${API}/collections/${id}`);
+        onCollectionsUpdate();
+        onJewelryUpdate();
+        alert('Colección eliminada exitosamente');
+      } catch (error) {
+        alert('Error al eliminar colección');
+      }
+    }
+  };
+
+  const saveJewelry = async (jewelry) => {
+    try {
+      if (jewelry.id) {
+        await axios.put(`${API}/jewelry-items/${jewelry.id}`, jewelry);
+      } else {
+        await axios.post(`${API}/jewelry-items`, jewelry);
+      }
+      onJewelryUpdate();
+      setEditingJewelry(null);
+      setNewJewelry({ name: '', description: '', image_base64: '', collection_id: '', position: 0 });
+      alert('Joya guardada exitosamente');
+    } catch (error) {
+      alert('Error al guardar joya');
+    }
+  };
+
+  const deleteJewelry = async (id) => {
+    if (window.confirm('¿Estás seguro de eliminar esta joya?')) {
+      try {
+        await axios.delete(`${API}/jewelry-items/${id}`);
+        onJewelryUpdate();
+        alert('Joya eliminada exitosamente');
+      } catch (error) {
+        alert('Error al eliminar joya');
+      }
+    }
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-4">Editor de Imagen</h2>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <img
-              src={editedImage}
-              alt="Preview"
-              style={applyFilters()}
-              className="w-full h-64 object-cover rounded border"
-            />
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Brillo: {brightness}%</label>
-              <input
-                type="range"
-                min="50"
-                max="150"
-                value={brightness}
-                onChange={(e) => setBrightness(e.target.value)}
-                className="w-full"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-2">Contraste: {contrast}%</label>
-              <input
-                type="range"
-                min="50"
-                max="150"
-                value={contrast}
-                onChange={(e) => setContrast(e.target.value)}
-                className="w-full"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-2">Saturación: {saturation}%</label>
-              <input
-                type="range"
-                min="0"
-                max="200"
-                value={saturation}
-                onChange={(e) => setSaturation(e.target.value)}
-                className="w-full"
-              />
-            </div>
-          </div>
+    <div className="modal-backdrop">
+      <div className="modal-content admin-panel">
+        <div className="admin-header">
+          <h2>Panel de Administración</h2>
+          <button onClick={onClose} className="close-btn">×</button>
         </div>
         
-        <div className="flex gap-4 mt-6">
-          <button
-            onClick={() => onSave(editedImage, { brightness, contrast, saturation })}
-            className="flex-1 bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
+        <div className="admin-tabs">
+          <button 
+            className={`tab ${activeTab === 'config' ? 'active' : ''}`}
+            onClick={() => setActiveTab('config')}
           >
-            Guardar Cambios
+            Configuración
           </button>
-          <button
-            onClick={onClose}
-            className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400"
+          <button 
+            className={`tab ${activeTab === 'collections' ? 'active' : ''}`}
+            onClick={() => setActiveTab('collections')}
           >
-            Cancelar
+            Colecciones
           </button>
+          <button 
+            className={`tab ${activeTab === 'jewelry' ? 'active' : ''}`}
+            onClick={() => setActiveTab('jewelry')}
+          >
+            Joyas
+          </button>
+        </div>
+
+        <div className="admin-content">
+          {activeTab === 'config' && (
+            <div className="config-panel">
+              <h3>Configuración del Sitio</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Nombre del Sitio</label>
+                  <input
+                    type="text"
+                    value={editConfig.site_name || ''}
+                    onChange={(e) => setEditConfig({...editConfig, site_name: e.target.value})}
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Nombre de la Artesana</label>
+                  <input
+                    type="text"
+                    value={editConfig.artisan_name || ''}
+                    onChange={(e) => setEditConfig({...editConfig, artisan_name: e.target.value})}
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-group full-width">
+                  <label>Historia de la Artesana</label>
+                  <textarea
+                    value={editConfig.artisan_story || ''}
+                    onChange={(e) => setEditConfig({...editConfig, artisan_story: e.target.value})}
+                    className="form-textarea"
+                    rows="4"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Email de Contacto</label>
+                  <input
+                    type="email"
+                    value={editConfig.artisan_contact || ''}
+                    onChange={(e) => setEditConfig({...editConfig, artisan_contact: e.target.value})}
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Teléfono</label>
+                  <input
+                    type="text"
+                    value={editConfig.artisan_phone || ''}
+                    onChange={(e) => setEditConfig({...editConfig, artisan_phone: e.target.value})}
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-group full-width">
+                  <label>Dirección</label>
+                  <input
+                    type="text"
+                    value={editConfig.artisan_address || ''}
+                    onChange={(e) => setEditConfig({...editConfig, artisan_address: e.target.value})}
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Esquema de Color</label>
+                  <select
+                    value={editConfig.color_scheme || 'gold'}
+                    onChange={(e) => setEditConfig({...editConfig, color_scheme: e.target.value})}
+                    className="form-select"
+                  >
+                    <option value="gold">Dorado</option>
+                    <option value="silver">Plateado</option>
+                    <option value="rose">Rosa</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Logo</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, (base64) => setEditConfig({...editConfig, logo_base64: base64}))}
+                    className="form-input"
+                  />
+                  {editConfig.logo_base64 && (
+                    <img src={editConfig.logo_base64} alt="Logo preview" className="image-preview" />
+                  )}
+                </div>
+              </div>
+              <button onClick={saveConfig} className="btn-primary">
+                Guardar Configuración
+              </button>
+            </div>
+          )}
+
+          {activeTab === 'collections' && (
+            <div className="collections-panel">
+              <div className="panel-header">
+                <h3>Gestión de Colecciones</h3>
+                <button 
+                  onClick={() => setEditingCollection(newCollection)}
+                  className="btn-primary"
+                >
+                  Nueva Colección
+                </button>
+              </div>
+              
+              <div className="collections-grid">
+                {collections.map(collection => (
+                  <div key={collection.id} className="collection-card-admin">
+                    <img src={collection.image_base64} alt={collection.name} className="collection-image-admin" />
+                    <div className="collection-info">
+                      <h4>{collection.name}</h4>
+                      <p>{collection.description}</p>
+                      <div className="collection-actions">
+                        <button 
+                          onClick={() => setEditingCollection(collection)}
+                          className="btn-secondary"
+                        >
+                          Editar
+                        </button>
+                        <button 
+                          onClick={() => deleteCollection(collection.id)}
+                          className="btn-danger"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {editingCollection && (
+                <div className="edit-modal">
+                  <div className="edit-content">
+                    <h4>{editingCollection.id ? 'Editar Colección' : 'Nueva Colección'}</h4>
+                    <div className="form-group">
+                      <label>Nombre</label>
+                      <input
+                        type="text"
+                        value={editingCollection.name || ''}
+                        onChange={(e) => setEditingCollection({...editingCollection, name: e.target.value})}
+                        className="form-input"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Descripción</label>
+                      <textarea
+                        value={editingCollection.description || ''}
+                        onChange={(e) => setEditingCollection({...editingCollection, description: e.target.value})}
+                        className="form-textarea"
+                        rows="3"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Imagen</label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleImageUpload(e, (base64) => setEditingCollection({...editingCollection, image_base64: base64}))}
+                        className="form-input"
+                      />
+                      {editingCollection.image_base64 && (
+                        <img src={editingCollection.image_base64} alt="Preview" className="image-preview" />
+                      )}
+                    </div>
+                    <div className="form-actions">
+                      <button onClick={() => saveCollection(editingCollection)} className="btn-primary">
+                        Guardar
+                      </button>
+                      <button onClick={() => setEditingCollection(null)} className="btn-secondary">
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'jewelry' && (
+            <div className="jewelry-panel">
+              <div className="panel-header">
+                <h3>Gestión de Joyas</h3>
+                <button 
+                  onClick={() => setEditingJewelry(newJewelry)}
+                  className="btn-primary"
+                >
+                  Nueva Joya
+                </button>
+              </div>
+              
+              <div className="jewelry-grid">
+                {jewelryItems.map(jewelry => (
+                  <div key={jewelry.id} className="jewelry-card-admin">
+                    <img src={jewelry.image_base64} alt={jewelry.name} className="jewelry-image-admin" />
+                    <div className="jewelry-info">
+                      <h4>{jewelry.name}</h4>
+                      <p>{jewelry.description}</p>
+                      <small>Colección: {collections.find(c => c.id === jewelry.collection_id)?.name}</small>
+                      <div className="jewelry-actions">
+                        <button 
+                          onClick={() => setEditingJewelry(jewelry)}
+                          className="btn-secondary"
+                        >
+                          Editar
+                        </button>
+                        <button 
+                          onClick={() => deleteJewelry(jewelry.id)}
+                          className="btn-danger"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {editingJewelry && (
+                <div className="edit-modal">
+                  <div className="edit-content">
+                    <h4>{editingJewelry.id ? 'Editar Joya' : 'Nueva Joya'}</h4>
+                    <div className="form-group">
+                      <label>Nombre</label>
+                      <input
+                        type="text"
+                        value={editingJewelry.name || ''}
+                        onChange={(e) => setEditingJewelry({...editingJewelry, name: e.target.value})}
+                        className="form-input"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Descripción</label>
+                      <textarea
+                        value={editingJewelry.description || ''}
+                        onChange={(e) => setEditingJewelry({...editingJewelry, description: e.target.value})}
+                        className="form-textarea"
+                        rows="3"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Colección</label>
+                      <select
+                        value={editingJewelry.collection_id || ''}
+                        onChange={(e) => setEditingJewelry({...editingJewelry, collection_id: e.target.value})}
+                        className="form-select"
+                      >
+                        <option value="">Seleccionar colección</option>
+                        {collections.map(collection => (
+                          <option key={collection.id} value={collection.id}>
+                            {collection.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Imagen</label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleImageUpload(e, (base64) => setEditingJewelry({...editingJewelry, image_base64: base64}))}
+                        className="form-input"
+                      />
+                      {editingJewelry.image_base64 && (
+                        <img src={editingJewelry.image_base64} alt="Preview" className="image-preview" />
+                      )}
+                    </div>
+                    <div className="form-actions">
+                      <button onClick={() => saveJewelry(editingJewelry)} className="btn-primary">
+                        Guardar
+                      </button>
+                      <button onClick={() => setEditingJewelry(null)} className="btn-secondary">
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
+    </div>
+  );
+};
+
+// Scroll Reveal Component
+const ScrollReveal = ({ children, direction = 'up', delay = 0 }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const elementRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => setIsVisible(true), delay);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (elementRef.current) {
+      observer.observe(elementRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [delay]);
+
+  return (
+    <div
+      ref={elementRef}
+      className={`scroll-reveal ${isVisible ? 'visible' : ''} reveal-${direction}`}
+      style={{ '--delay': `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+};
+
+// Parallax Component
+const ParallaxSection = ({ children, speed = 0.5, className = '' }) => {
+  const [offsetY, setOffsetY] = useState(0);
+  const elementRef = useRef();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (elementRef.current) {
+        const rect = elementRef.current.getBoundingClientRect();
+        const scrolled = window.pageYOffset;
+        const rate = scrolled * -speed;
+        setOffsetY(rate);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [speed]);
+
+  return (
+    <div
+      ref={elementRef}
+      className={`parallax-section ${className}`}
+      style={{ transform: `translateY(${offsetY}px)` }}
+    >
+      {children}
     </div>
   );
 };
@@ -217,10 +640,9 @@ const JewelryApp = () => {
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
-  const [showImageEditor, setShowImageEditor] = useState(false);
-  const [editingImage, setEditingImage] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showHiddenZone, setShowHiddenZone] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
   const { isAuthenticated, logout } = useAuth();
 
   // Color schemes
@@ -250,10 +672,12 @@ const JewelryApp = () => {
 
   const currentScheme = colorSchemes[siteConfig?.color_scheme || 'gold'];
 
-  // Scroll effect for logo
+  // Scroll effects
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      const scrolled = window.scrollY;
+      setScrollY(scrolled);
+      setIsScrolled(scrolled > 50);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -313,27 +737,6 @@ const JewelryApp = () => {
     }
   };
 
-  const handleImageUpload = (e, callback) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const base64 = event.target.result;
-        setEditingImage({ base64, callback });
-        setShowImageEditor(true);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const saveEditedImage = (imageBase64, filters) => {
-    if (editingImage && editingImage.callback) {
-      editingImage.callback(imageBase64);
-    }
-    setShowImageEditor(false);
-    setEditingImage(null);
-  };
-
   const getItemsByCollection = (collectionId) => {
     return jewelryItems.filter(item => item.collection_id === collectionId);
   };
@@ -354,14 +757,14 @@ const JewelryApp = () => {
 
     return (
       <div
-        className={`fixed ${positionClasses[position]} w-8 h-8 cursor-pointer z-40`}
+        className={`fixed ${positionClasses[position]} w-8 h-8 cursor-pointer z-40 admin-zone`}
         onClick={handleHiddenZoneClick}
         title="Zona de administración"
       >
         {showHiddenZone && (
           <button
             onClick={() => setShowLoginModal(true)}
-            className={`bg-gradient-to-r ${currentScheme.primary} text-white px-4 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all text-sm`}
+            className="admin-access-btn"
           >
             Admin
           </button>
@@ -372,161 +775,190 @@ const JewelryApp = () => {
 
   if (!siteConfig) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-amber-600"></div>
+      <div className="loading-screen">
+        <div className="loading-spinner-elegant"></div>
+        <p>Cargando experiencia elegante...</p>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen bg-${currentScheme.bg}`}>
-      {/* Header con logo adaptable */}
-      <header className={`fixed top-0 left-0 right-0 z-30 transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-lg py-2' : 'bg-transparent py-4'
-      }`}>
-        <div className="container mx-auto px-4 flex items-center justify-center">
+    <div className={`app-container ${currentScheme.bg}`}>
+      <CustomCursor />
+      
+      {/* Header con logo adaptable y efectos parallax */}
+      <header className={`main-header ${isScrolled ? 'scrolled' : ''}`}>
+        <div className="header-content">
           {siteConfig.logo_base64 && (
-            <img
-              src={siteConfig.logo_base64}
-              alt={siteConfig.site_name}
-              className={`transition-all duration-300 ${
-                isScrolled ? 'h-12' : 'h-20'
-              } object-contain`}
-            />
+            <div className="logo-container">
+              <img
+                src={siteConfig.logo_base64}
+                alt={siteConfig.site_name}
+                className="logo"
+                style={{ transform: `scale(${1 - scrollY * 0.0005})` }}
+              />
+            </div>
           )}
-          <h1 className={`text-${currentScheme.text} font-bold transition-all duration-300 ${
-            isScrolled ? 'text-2xl ml-4' : 'text-4xl ml-6'
-          }`}>
-            {siteConfig.site_name}
-          </h1>
+          <div className="site-title">
+            <h1 className="site-name">{siteConfig.site_name}</h1>
+            <div className="site-divider"></div>
+          </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className={`pt-32 pb-16 bg-gradient-to-r ${currentScheme.primary} text-white`}>
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            {siteConfig.artisan_name}
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
-            Joyería Artesanal de Alto Standing
-          </p>
-          <p className="text-lg max-w-2xl mx-auto leading-relaxed">
-            {siteConfig.artisan_story}
-          </p>
+      {/* Hero Section con parallax */}
+      <section className="hero-section">
+        <ParallaxSection speed={0.3} className="hero-bg">
+          <div className="hero-overlay"></div>
+        </ParallaxSection>
+        <div className="hero-content">
+          <ScrollReveal direction="up" delay={300}>
+            <h1 className="hero-title">{siteConfig.artisan_name}</h1>
+          </ScrollReveal>
+          <ScrollReveal direction="up" delay={600}>
+            <div className="hero-subtitle">
+              <span className="subtitle-line"></span>
+              <span className="subtitle-text">Joyería Artesanal de Alto Standing</span>
+              <span className="subtitle-line"></span>
+            </div>
+          </ScrollReveal>
+          <ScrollReveal direction="up" delay={900}>
+            <p className="hero-description">
+              {siteConfig.artisan_story}
+            </p>
+          </ScrollReveal>
+          <ScrollReveal direction="up" delay={1200}>
+            <div className="hero-cta">
+              <button 
+                className="cta-button"
+                onClick={() => document.getElementById('collections').scrollIntoView({ behavior: 'smooth' })}
+              >
+                Explorar Colecciones
+                <span className="cta-arrow">→</span>
+              </button>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
-      {/* Collections Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <h2 className={`text-4xl font-bold text-center mb-12 text-${currentScheme.text}`}>
-            Nuestras Colecciones
-          </h2>
+      {/* Collections Section con efectos avanzados */}
+      <section id="collections" className="collections-section">
+        <div className="section-container">
+          <ScrollReveal direction="up" delay={200}>
+            <div className="section-header">
+              <h2 className="section-title">Nuestras Colecciones</h2>
+              <div className="section-subtitle">Cada pieza cuenta una historia única</div>
+            </div>
+          </ScrollReveal>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {collections.map((collection) => (
-              <div
-                key={collection.id}
-                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
-                onClick={() => setSelectedCollection(collection)}
-              >
-                <div className="h-64 overflow-hidden">
-                  <img
-                    src={collection.image_base64}
-                    alt={collection.name}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
+          <div className="collections-showcase">
+            {collections.map((collection, index) => (
+              <ScrollReveal key={collection.id} direction="up" delay={200 * (index + 1)}>
+                <div 
+                  className="collection-card-elegant clickable"
+                  onClick={() => setSelectedCollection(collection)}
+                >
+                  <div className="collection-image-container">
+                    <img
+                      src={collection.image_base64}
+                      alt={collection.name}
+                      className="collection-image"
+                    />
+                    <div className="collection-overlay">
+                      <div className="overlay-content">
+                        <span className="view-collection">Ver Colección</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="collection-content">
+                    <h3 className="collection-name">{collection.name}</h3>
+                    <p className="collection-description">{collection.description}</p>
+                    <div className="collection-cta">
+                      <span className="cta-text">Explorar</span>
+                      <span className="cta-icon">→</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="p-6">
-                  <h3 className={`text-2xl font-bold mb-3 text-${currentScheme.text}`}>
-                    {collection.name}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    {collection.description}
-                  </p>
-                  <button className={`mt-4 bg-gradient-to-r ${currentScheme.primary} text-white px-6 py-2 rounded-lg hover:shadow-md transition-all`}>
-                    Ver Colección
-                  </button>
-                </div>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Collection Detail Modal */}
+      {/* Collection Detail Modal Mejorado */}
       {selectedCollection && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b">
-              <div className="flex justify-between items-center">
-                <h2 className={`text-3xl font-bold text-${currentScheme.text}`}>
-                  {selectedCollection.name}
-                </h2>
-                <button
-                  onClick={() => setSelectedCollection(null)}
-                  className="text-gray-500 hover:text-gray-700 text-2xl"
-                >
-                  ×
-                </button>
+        <div className="modal-backdrop collection-modal-backdrop">
+          <div className="collection-modal">
+            <div className="modal-header-elegant">
+              <div>
+                <h2 className="modal-title-elegant">{selectedCollection.name}</h2>
+                <p className="modal-subtitle-elegant">{selectedCollection.description}</p>
               </div>
-              <p className="text-gray-600 mt-2">{selectedCollection.description}</p>
+              <button
+                onClick={() => setSelectedCollection(null)}
+                className="close-btn-elegant"
+              >
+                ×
+              </button>
             </div>
             
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {getItemsByCollection(selectedCollection.id).map((item) => (
-                  <div key={item.id} className="bg-gray-50 rounded-lg overflow-hidden shadow-md">
-                    <div className="h-48 overflow-hidden">
-                      <img
-                        src={item.image_base64}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h4 className={`font-bold text-lg mb-2 text-${currentScheme.text}`}>
-                        {item.name}
-                      </h4>
-                      <p className="text-gray-600 text-sm">
-                        {item.description}
-                      </p>
-                    </div>
+            <div className="jewelry-showcase">
+              {getItemsByCollection(selectedCollection.id).map((item, index) => (
+                <div key={item.id} className="jewelry-card-elegant">
+                  <div className="jewelry-image-container">
+                    <img
+                      src={item.image_base64}
+                      alt={item.name}
+                      className="jewelry-image"
+                    />
+                    <div className="jewelry-shine-effect"></div>
                   </div>
-                ))}
-              </div>
+                  <div className="jewelry-content">
+                    <h4 className="jewelry-name">{item.name}</h4>
+                    <p className="jewelry-description">{item.description}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       )}
 
-      {/* Footer */}
-      <footer className={`bg-gradient-to-r ${currentScheme.primary} text-white py-12`}>
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <h3 className="text-2xl font-bold mb-4">{siteConfig.artisan_name}</h3>
-              <p className="text-lg leading-relaxed">{siteConfig.artisan_story}</p>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-bold mb-4">Contacto</h3>
-              <div className="space-y-2">
-                <p>{siteConfig.artisan_contact}</p>
-                <p>{siteConfig.artisan_phone}</p>
-                <p>{siteConfig.artisan_address}</p>
+      {/* Footer elegante */}
+      <footer className="footer-elegant">
+        <div className="footer-content">
+          <div className="footer-grid">
+            <ScrollReveal direction="up" delay={200}>
+              <div className="footer-section">
+                <h3 className="footer-title">{siteConfig.artisan_name}</h3>
+                <p className="footer-story">{siteConfig.artisan_story}</p>
               </div>
-            </div>
+            </ScrollReveal>
             
-            <div>
-              <h3 className="text-xl font-bold mb-4">Síguenos</h3>
-              <p>Joyería artesanal de la más alta calidad, creada con pasión y dedicación.</p>
-            </div>
+            <ScrollReveal direction="up" delay={400}>
+              <div className="footer-section">
+                <h3 className="footer-title">Contacto</h3>
+                <div className="contact-info">
+                  <p className="contact-item">{siteConfig.artisan_contact}</p>
+                  <p className="contact-item">{siteConfig.artisan_phone}</p>
+                  <p className="contact-item">{siteConfig.artisan_address}</p>
+                </div>
+              </div>
+            </ScrollReveal>
+            
+            <ScrollReveal direction="up" delay={600}>
+              <div className="footer-section">
+                <h3 className="footer-title">Síguenos</h3>
+                <p className="footer-follow">Joyería artesanal de la más alta calidad, creada con pasión y dedicación.</p>
+              </div>
+            </ScrollReveal>
           </div>
           
-          <div className="border-t border-white border-opacity-20 mt-8 pt-8 text-center">
-            <p>&copy; 2025 {siteConfig.site_name}. Todos los derechos reservados.</p>
+          <div className="footer-bottom">
+            <div className="footer-divider"></div>
+            <p className="footer-copyright">
+              &copy; 2025 {siteConfig.site_name}. Todos los derechos reservados.
+            </p>
           </div>
         </div>
       </footer>
@@ -537,47 +969,32 @@ const JewelryApp = () => {
       {/* Modals */}
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
       
-      {showImageEditor && (
-        <ImageEditor
-          imageBase64={editingImage?.base64}
-          onSave={saveEditedImage}
-          onClose={() => {
-            setShowImageEditor(false);
-            setEditingImage(null);
-          }}
-        />
-      )}
+      <AdminPanel
+        isOpen={showAdminPanel}
+        onClose={() => setShowAdminPanel(false)}
+        siteConfig={siteConfig}
+        onConfigUpdate={loadSiteConfig}
+        collections={collections}
+        onCollectionsUpdate={loadCollections}
+        jewelryItems={jewelryItems}
+        onJewelryUpdate={loadJewelryItems}
+      />
 
-      {/* Admin Panel - Simplified for demo */}
+      {/* Admin Access Button */}
       {isAuthenticated && (
-        <div className="fixed top-4 right-4 z-50">
+        <div className="admin-float-button">
           <button
             onClick={() => setShowAdminPanel(!showAdminPanel)}
-            className={`bg-gradient-to-r ${currentScheme.primary} text-white px-4 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all`}
+            className="float-admin-btn"
           >
-            {showAdminPanel ? 'Cerrar Panel' : 'Panel Admin'}
+            {showAdminPanel ? '×' : '⚙'}
           </button>
           
           {showAdminPanel && (
-            <div className="mt-2 bg-white rounded-lg shadow-xl p-4 w-64">
-              <h3 className="font-bold mb-3">Panel de Administración</h3>
-              <div className="space-y-2">
-                <button className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded">
-                  Editar Configuración
-                </button>
-                <button className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded">
-                  Gestionar Colecciones
-                </button>
-                <button className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded">
-                  Agregar Joyas
-                </button>
-                <button
-                  onClick={logout}
-                  className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded text-red-600"
-                >
-                  Cerrar Sesión
-                </button>
-              </div>
+            <div className="admin-quick-menu">
+              <button onClick={logout} className="logout-btn">
+                Cerrar Sesión
+              </button>
             </div>
           )}
         </div>

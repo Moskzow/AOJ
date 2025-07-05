@@ -1323,7 +1323,7 @@ const JewelryApp = () => {
 
   return (
     <div className={`app-container ${currentScheme.bg}`}>
-      <CustomCursor />
+      {/* Cursor personalizado eliminado */}
       
       {/* Header con logo adaptable y efectos parallax */}
       <header className={`main-header ${isScrolled ? 'scrolled' : ''}`}>

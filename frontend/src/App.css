@@ -244,7 +244,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   letter-spacing: 1px;
   text-transform: uppercase;
   border-radius: 50px;
-  cursor: none;
+  cursor: pointer;
   transition: var(--transition-smooth);
   box-shadow: var(--shadow-elegant);
   display: inline-flex;

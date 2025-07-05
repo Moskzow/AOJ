@@ -71,31 +71,98 @@ class CollectionCreate(BaseModel):
 
 class SiteConfig(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    # Información básica del sitio
     site_name: str = "Joyería Artesanal"
+    site_subtitle: str = "Joyería Artesanal de Alto Standing"
+    hero_title: str = "Maestra Artesana"
+    hero_description: str = "Cada pieza cuenta una historia única, creada con pasión y dedicación en nuestro taller artesanal."
+    collections_title: str = "Nuestras Colecciones"
+    collections_subtitle: str = "Cada pieza cuenta una historia única"
+    
+    # Información del artesano
     artisan_name: str = "Maestra Artesana"
-    artisan_story: str = "Historia de la artesana..."
+    artisan_story: str = "Con más de 20 años de experiencia en joyería artesanal, cada pieza es única y está hecha con amor y dedicación."
     artisan_contact: str = "contacto@joyeria.com"
     artisan_phone: str = "+34 000 000 000"
-    artisan_address: str = "Dirección del taller"
+    artisan_address: str = "Calle Artesanos 123, Madrid, España"
+    
+    # Redes sociales
+    social_facebook: str = ""
+    social_facebook_enabled: bool = False
+    social_instagram: str = ""
+    social_instagram_enabled: bool = False
+    social_tiktok: str = ""
+    social_tiktok_enabled: bool = False
+    social_whatsapp: str = ""
+    social_whatsapp_enabled: bool = False
+    social_youtube: str = ""
+    social_youtube_enabled: bool = False
+    social_twitter: str = ""
+    social_twitter_enabled: bool = False
+    
+    # Configuración visual
     logo_base64: str = ""
     color_scheme: str = "gold"
+    
+    # Configuración admin
     admin_username: str = "admin"
     admin_password_hash: str = ""
     hidden_zone_position: str = "bottom-right"
+    
+    # Textos del footer
+    footer_title_1: str = "Sobre Nosotros"
+    footer_title_2: str = "Contacto"
+    footer_title_3: str = "Síguenos"
+    footer_text_3: str = "Conecta con nosotros en redes sociales"
+    footer_copyright: str = "Todos los derechos reservados."
+    
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class SiteConfigUpdate(BaseModel):
+    # Información básica del sitio
     site_name: Optional[str] = None
+    site_subtitle: Optional[str] = None
+    hero_title: Optional[str] = None
+    hero_description: Optional[str] = None
+    collections_title: Optional[str] = None
+    collections_subtitle: Optional[str] = None
+    
+    # Información del artesano
     artisan_name: Optional[str] = None
     artisan_story: Optional[str] = None
     artisan_contact: Optional[str] = None
     artisan_phone: Optional[str] = None
     artisan_address: Optional[str] = None
+    
+    # Redes sociales
+    social_facebook: Optional[str] = None
+    social_facebook_enabled: Optional[bool] = None
+    social_instagram: Optional[str] = None
+    social_instagram_enabled: Optional[bool] = None
+    social_tiktok: Optional[str] = None
+    social_tiktok_enabled: Optional[bool] = None
+    social_whatsapp: Optional[str] = None
+    social_whatsapp_enabled: Optional[bool] = None
+    social_youtube: Optional[str] = None
+    social_youtube_enabled: Optional[bool] = None
+    social_twitter: Optional[str] = None
+    social_twitter_enabled: Optional[bool] = None
+    
+    # Configuración visual
     logo_base64: Optional[str] = None
     color_scheme: Optional[str] = None
+    
+    # Configuración admin
     admin_username: Optional[str] = None
     admin_password: Optional[str] = None
     hidden_zone_position: Optional[str] = None
+    
+    # Textos del footer
+    footer_title_1: Optional[str] = None
+    footer_title_2: Optional[str] = None
+    footer_title_3: Optional[str] = None
+    footer_text_3: Optional[str] = None
+    footer_copyright: Optional[str] = None
 
 # Helper functions
 def hash_password(password: str) -> str:

@@ -712,15 +712,29 @@ const JewelryApp = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Hidden zone timer
+  // Hidden zone timer mejorado
   useEffect(() => {
     let timer;
-    if (showHiddenZone) {
+    if (isTimerActive) {
       timer = setTimeout(() => {
-        setShowHiddenZone(false);
+        setShowHiddenZone(true);
+        setIsTimerActive(false);
       }, 30000);
     }
     return () => clearTimeout(timer);
+  }, [isTimerActive]);
+
+  // Reset hidden zone después de mostrar el botón
+  useEffect(() => {
+    let resetTimer;
+    if (showHiddenZone) {
+      resetTimer = setTimeout(() => {
+        setShowHiddenZone(false);
+        setHiddenClicks(0);
+        setIsTimerActive(false);
+      }, 10000); // El botón desaparece después de 10 segundos
+    }
+    return () => clearTimeout(resetTimer);
   }, [showHiddenZone]);
 
   // Load initial data

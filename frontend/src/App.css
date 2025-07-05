@@ -241,7 +241,6 @@ body {
   letter-spacing: 1px;
   text-transform: uppercase;
   border-radius: 50px;
-  cursor: pointer;
   transition: var(--transition-smooth);
   box-shadow: var(--shadow-elegant);
   display: inline-flex;
@@ -340,7 +339,6 @@ body {
   overflow: hidden;
   box-shadow: 0 10px 40px rgba(0,0,0,0.08);
   transition: var(--transition-smooth);
-  cursor: pointer;
   position: relative;
 }
 
@@ -406,7 +404,6 @@ body {
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 600;
-  cursor: pointer;
   transition: var(--transition-fast);
 }
 
@@ -426,7 +423,6 @@ body {
   border-radius: 15px;
   font-size: 0.8rem;
   font-weight: 600;
-  cursor: pointer;
   transition: var(--transition-fast);
   opacity: 0;
 }
@@ -546,7 +542,6 @@ body {
   border: none;
   font-size: 2rem;
   color: #999;
-  cursor: pointer;
   transition: var(--transition-fast);
   width: 40px;
   height: 40px;
@@ -705,7 +700,6 @@ body {
   height: 20px;
   border-radius: 50%;
   background: linear-gradient(45deg, #d4af37, #f4e4a6);
-  cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   transition: var(--transition-fast);
 }
@@ -719,7 +713,6 @@ body {
   height: 20px;
   border-radius: 50%;
   background: linear-gradient(45deg, #d4af37, #f4e4a6);
-  cursor: pointer;
   border: none;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
@@ -811,7 +804,6 @@ body {
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
-  cursor: pointer;
   transition: var(--transition-fast);
   flex: 1;
 }
@@ -828,7 +820,6 @@ body {
 
 .btn-primary.loading {
   opacity: 0.7;
-  cursor: not-allowed;
 }
 
 .btn-secondary {
@@ -887,7 +878,6 @@ body {
   border: none;
   font-size: 2rem;
   color: #999;
-  cursor: pointer;
   transition: var(--transition-fast);
   width: 40px;
   height: 40px;
@@ -916,7 +906,6 @@ body {
   font-size: 1rem;
   font-weight: 600;
   color: #666;
-  cursor: pointer;
   transition: var(--transition-fast);
   border-bottom: 3px solid transparent;
   white-space: nowrap;
@@ -1040,7 +1029,6 @@ body {
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 600;
-  cursor: pointer;
   transition: var(--transition-fast);
   flex: 1;
 }
@@ -1176,7 +1164,6 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  cursor: pointer;
   transition: var(--transition-fast);
   backdrop-filter: blur(10px);
 }
@@ -1209,7 +1196,6 @@ body {
   border-radius: 25px;
   font-weight: 600;
   font-size: 0.9rem;
-  cursor: pointer;
   transition: var(--transition-fast);
   box-shadow: var(--shadow-elegant);
   text-transform: uppercase;
@@ -1333,7 +1319,6 @@ body {
   border: none;
   border-radius: 50%;
   font-size: 1.5rem;
-  cursor: pointer;
   transition: var(--transition-fast);
   box-shadow: var(--shadow-elegant);
   display: flex;
@@ -1364,7 +1349,6 @@ body {
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 0.9rem;
-  cursor: pointer;
   transition: var(--transition-fast);
   width: 100%;
 }
@@ -1496,7 +1480,6 @@ textarea:focus-visible {
 }
 
 .clickable {
-  cursor: pointer;
 }
 
 /* Print styles */

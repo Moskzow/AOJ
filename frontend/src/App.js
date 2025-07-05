@@ -279,10 +279,43 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
   // Inicializar editConfig cuando se abre el panel o cambia siteConfig
   useEffect(() => {
     console.log('Effect ejecutándose - siteConfig:', siteConfig, 'isOpen:', isOpen);
-    if (siteConfig && isOpen && Object.keys(siteConfig).length > 0) {
+    if (isOpen && siteConfig && Object.keys(siteConfig).length > 0) {
       console.log('Inicializando editConfig con:', siteConfig);
-      const configCopy = JSON.parse(JSON.stringify(siteConfig)); // Deep copy
+      // Crear una copia profunda del siteConfig para evitar mutaciones
+      const configCopy = { ...siteConfig };
       setEditConfig(configCopy);
+      console.log('EditConfig inicializado con:', configCopy);
+    } else if (isOpen && (!siteConfig || Object.keys(siteConfig).length === 0)) {
+      console.log('SiteConfig vacío, inicializando editConfig con valores por defecto');
+      setEditConfig({
+        site_name: '',
+        artisan_name: '',
+        artisan_story: '',
+        artisan_contact: '',
+        site_subtitle: '',
+        hero_title: '',
+        hero_description: '',
+        collections_title: '',
+        collections_subtitle: '',
+        footer_title_1: '',
+        footer_title_2: '',
+        footer_title_3: '',
+        footer_text_3: '',
+        footer_copyright: '',
+        social_facebook: '',
+        social_instagram: '',
+        social_tiktok: '',
+        social_whatsapp: '',
+        social_youtube: '',
+        social_twitter: '',
+        social_facebook_enabled: false,
+        social_instagram_enabled: false,
+        social_tiktok_enabled: false,
+        social_whatsapp_enabled: false,
+        social_youtube_enabled: false,
+        social_twitter_enabled: false,
+        color_scheme: 'gold'
+      });
     }
   }, [siteConfig, isOpen]);
 

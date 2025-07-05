@@ -122,15 +122,18 @@ backend:
 
   - task: "Site configuration management"
     implemented: true
-    working: "needs_testing"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "needs_testing"
         agent: "main"
         comment: "Created site config API with editable artisan data, color schemes, and admin settings"
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested GET /api/config endpoint and verified site configuration data"
 
   - task: "Collections CRUD operations"
     implemented: true

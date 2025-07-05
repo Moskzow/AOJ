@@ -160,6 +160,9 @@ const LoginModal = ({ isOpen, onClose }) => {
     setIsLoading(false);
     if (result.success) {
       onClose();
+      setUsername('');
+      setPassword('');
+      setError('');
     } else {
       setError(result.error);
     }
@@ -218,9 +221,140 @@ const LoginModal = ({ isOpen, onClose }) => {
   );
 };
 
-// Panel de Administración Completo
+// Componente Editor de Imágenes FUNCIONAL
+const ImageEditor = ({ imageBase64, onSave, onClose, itemId, collectionId }) => {
+  const [editedImage, setEditedImage] = useState(imageBase64);
+  const [brightness, setBrightness] = useState(100);
+  const [contrast, setContrast] = useState(100);
+  const [saturation, setSaturation] = useState(100);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const applyFilters = () => {
+    return {
+      filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`
+    };
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      // Crear canvas para aplicar los filtros a la imagen
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = async () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        // Aplicar filtros
+        ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+        ctx.drawImage(img, 0, 0);
+        
+        // Convertir a base64
+        const filteredImageBase64 = canvas.toDataURL('image/jpeg', 0.9);
+        
+        // Guardar en el backend
+        await axios.post(`${API}/save-edited-image`, {
+          item_id: itemId,
+          collection_id: collectionId,
+          image_base64: filteredImageBase64
+        });
+        
+        // Callback para actualizar la UI
+        onSave(filteredImageBase64, { brightness, contrast, saturation });
+        
+        alert('Imagen guardada exitosamente');
+        onClose();
+      };
+      
+      img.src = editedImage;
+    } catch (error) {
+      console.error('Error saving image:', error);
+      alert('Error al guardar la imagen');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="modal-backdrop">
+      <div className="modal-content image-editor-modal">
+        <h2 className="modal-title">Editor de Imagen</h2>
+        
+        <div className="image-editor-content">
+          <div className="image-preview-section">
+            <img
+              src={editedImage}
+              alt="Preview"
+              style={applyFilters()}
+              className="image-preview-large"
+            />
+          </div>
+          
+          <div className="controls-section">
+            <div className="control-group">
+              <label className="control-label">Brillo: {brightness}%</label>
+              <input
+                type="range"
+                min="50"
+                max="150"
+                value={brightness}
+                onChange={(e) => setBrightness(e.target.value)}
+                className="range-slider"
+              />
+            </div>
+            
+            <div className="control-group">
+              <label className="control-label">Contraste: {contrast}%</label>
+              <input
+                type="range"
+                min="50"
+                max="150"
+                value={contrast}
+                onChange={(e) => setContrast(e.target.value)}
+                className="range-slider"
+              />
+            </div>
+            
+            <div className="control-group">
+              <label className="control-label">Saturación: {saturation}%</label>
+              <input
+                type="range"
+                min="0"
+                max="200"
+                value={saturation}
+                onChange={(e) => setSaturation(e.target.value)}
+                className="range-slider"
+              />
+            </div>
+          </div>
+        </div>
+        
+        <div className="form-actions">
+          <button
+            onClick={handleSave}
+            className={`btn-primary ${isSaving ? 'loading' : ''}`}
+            disabled={isSaving}
+          >
+            {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+          </button>
+          <button
+            onClick={onClose}
+            className="btn-secondary"
+            disabled={isSaving}
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Panel de Administración Completo y Expandido
 const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, onCollectionsUpdate, jewelryItems, onJewelryUpdate }) => {
-  const [activeTab, setActiveTab] = useState('config');
+  const [activeTab, setActiveTab] = useState('general');
   const [editConfig, setEditConfig] = useState(siteConfig || {});
   const [editingCollection, setEditingCollection] = useState(null);
   const [editingJewelry, setEditingJewelry] = useState(null);
@@ -317,10 +451,22 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
         
         <div className="admin-tabs">
           <button 
-            className={`tab ${activeTab === 'config' ? 'active' : ''}`}
-            onClick={() => setActiveTab('config')}
+            className={`tab ${activeTab === 'general' ? 'active' : ''}`}
+            onClick={() => setActiveTab('general')}
           >
-            Configuración
+            General
+          </button>
+          <button 
+            className={`tab ${activeTab === 'textos' ? 'active' : ''}`}
+            onClick={() => setActiveTab('textos')}
+          >
+            Textos
+          </button>
+          <button 
+            className={`tab ${activeTab === 'redes' ? 'active' : ''}`}
+            onClick={() => setActiveTab('redes')}
+          >
+            Redes Sociales
           </button>
           <button 
             className={`tab ${activeTab === 'collections' ? 'active' : ''}`}
@@ -337,9 +483,9 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
         </div>
 
         <div className="admin-content">
-          {activeTab === 'config' && (
+          {activeTab === 'general' && (
             <div className="config-panel">
-              <h3>Configuración del Sitio</h3>
+              <h3>Configuración General</h3>
               <div className="form-grid">
                 <div className="form-group">
                   <label>Nombre del Sitio</label>
@@ -421,7 +567,227 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
                 </div>
               </div>
               <button onClick={saveConfig} className="btn-primary">
-                Guardar Configuración
+                Guardar Configuración General
+              </button>
+            </div>
+          )}
+
+          {activeTab === 'textos' && (
+            <div className="config-panel">
+              <h3>Personalización de Textos</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Subtítulo del Sitio</label>
+                  <input
+                    type="text"
+                    value={editConfig.site_subtitle || ''}
+                    onChange={(e) => setEditConfig({...editConfig, site_subtitle: e.target.value})}
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Título del Hero</label>
+                  <input
+                    type="text"
+                    value={editConfig.hero_title || ''}
+                    onChange={(e) => setEditConfig({...editConfig, hero_title: e.target.value})}
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-group full-width">
+                  <label>Descripción del Hero</label>
+                  <textarea
+                    value={editConfig.hero_description || ''}
+                    onChange={(e) => setEditConfig({...editConfig, hero_description: e.target.value})}
+                    className="form-textarea"
+                    rows="3"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Título de Colecciones</label>
+                  <input
+                    type="text"
+                    value={editConfig.collections_title || ''}
+                    onChange={(e) => setEditConfig({...editConfig, collections_title: e.target.value})}
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Subtítulo de Colecciones</label>
+                  <input
+                    type="text"
+                    value={editConfig.collections_subtitle || ''}
+                    onChange={(e) => setEditConfig({...editConfig, collections_subtitle: e.target.value})}
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Título Footer 1</label>
+                  <input
+                    type="text"
+                    value={editConfig.footer_title_1 || ''}
+                    onChange={(e) => setEditConfig({...editConfig, footer_title_1: e.target.value})}
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Título Footer 2</label>
+                  <input
+                    type="text"
+                    value={editConfig.footer_title_2 || ''}
+                    onChange={(e) => setEditConfig({...editConfig, footer_title_2: e.target.value})}
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Título Footer 3</label>
+                  <input
+                    type="text"
+                    value={editConfig.footer_title_3 || ''}
+                    onChange={(e) => setEditConfig({...editConfig, footer_title_3: e.target.value})}
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-group full-width">
+                  <label>Texto Footer 3</label>
+                  <textarea
+                    value={editConfig.footer_text_3 || ''}
+                    onChange={(e) => setEditConfig({...editConfig, footer_text_3: e.target.value})}
+                    className="form-textarea"
+                    rows="2"
+                  />
+                </div>
+                <div className="form-group full-width">
+                  <label>Texto Copyright</label>
+                  <input
+                    type="text"
+                    value={editConfig.footer_copyright || ''}
+                    onChange={(e) => setEditConfig({...editConfig, footer_copyright: e.target.value})}
+                    className="form-input"
+                  />
+                </div>
+              </div>
+              <button onClick={saveConfig} className="btn-primary">
+                Guardar Textos Personalizados
+              </button>
+            </div>
+          )}
+
+          {activeTab === 'redes' && (
+            <div className="config-panel">
+              <h3>Redes Sociales</h3>
+              <div className="form-grid">
+                <div className="form-group social-group">
+                  <label className="social-label">
+                    <input
+                      type="checkbox"
+                      checked={editConfig.social_facebook_enabled || false}
+                      onChange={(e) => setEditConfig({...editConfig, social_facebook_enabled: e.target.checked})}
+                    />
+                    Facebook
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://facebook.com/tupagina"
+                    value={editConfig.social_facebook || ''}
+                    onChange={(e) => setEditConfig({...editConfig, social_facebook: e.target.value})}
+                    className="form-input"
+                    disabled={!editConfig.social_facebook_enabled}
+                  />
+                </div>
+                <div className="form-group social-group">
+                  <label className="social-label">
+                    <input
+                      type="checkbox"
+                      checked={editConfig.social_instagram_enabled || false}
+                      onChange={(e) => setEditConfig({...editConfig, social_instagram_enabled: e.target.checked})}
+                    />
+                    Instagram
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://instagram.com/tuusuario"
+                    value={editConfig.social_instagram || ''}
+                    onChange={(e) => setEditConfig({...editConfig, social_instagram: e.target.value})}
+                    className="form-input"
+                    disabled={!editConfig.social_instagram_enabled}
+                  />
+                </div>
+                <div className="form-group social-group">
+                  <label className="social-label">
+                    <input
+                      type="checkbox"
+                      checked={editConfig.social_tiktok_enabled || false}
+                      onChange={(e) => setEditConfig({...editConfig, social_tiktok_enabled: e.target.checked})}
+                    />
+                    TikTok
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://tiktok.com/@tuusuario"
+                    value={editConfig.social_tiktok || ''}
+                    onChange={(e) => setEditConfig({...editConfig, social_tiktok: e.target.value})}
+                    className="form-input"
+                    disabled={!editConfig.social_tiktok_enabled}
+                  />
+                </div>
+                <div className="form-group social-group">
+                  <label className="social-label">
+                    <input
+                      type="checkbox"
+                      checked={editConfig.social_whatsapp_enabled || false}
+                      onChange={(e) => setEditConfig({...editConfig, social_whatsapp_enabled: e.target.checked})}
+                    />
+                    WhatsApp
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="+34600000000"
+                    value={editConfig.social_whatsapp || ''}
+                    onChange={(e) => setEditConfig({...editConfig, social_whatsapp: e.target.value})}
+                    className="form-input"
+                    disabled={!editConfig.social_whatsapp_enabled}
+                  />
+                </div>
+                <div className="form-group social-group">
+                  <label className="social-label">
+                    <input
+                      type="checkbox"
+                      checked={editConfig.social_youtube_enabled || false}
+                      onChange={(e) => setEditConfig({...editConfig, social_youtube_enabled: e.target.checked})}
+                    />
+                    YouTube
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://youtube.com/c/tucanal"
+                    value={editConfig.social_youtube || ''}
+                    onChange={(e) => setEditConfig({...editConfig, social_youtube: e.target.value})}
+                    className="form-input"
+                    disabled={!editConfig.social_youtube_enabled}
+                  />
+                </div>
+                <div className="form-group social-group">
+                  <label className="social-label">
+                    <input
+                      type="checkbox"
+                      checked={editConfig.social_twitter_enabled || false}
+                      onChange={(e) => setEditConfig({...editConfig, social_twitter_enabled: e.target.checked})}
+                    />
+                    Twitter/X
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://twitter.com/tuusuario"
+                    value={editConfig.social_twitter || ''}
+                    onChange={(e) => setEditConfig({...editConfig, social_twitter: e.target.value})}
+                    className="form-input"
+                    disabled={!editConfig.social_twitter_enabled}
+                  />
+                </div>
+              </div>
+              <button onClick={saveConfig} className="btn-primary">
+                Guardar Redes Sociales
               </button>
             </div>
           )}
@@ -431,7 +797,7 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
               <div className="panel-header">
                 <h3>Gestión de Colecciones</h3>
                 <button 
-                  onClick={() => setEditingCollection(newCollection)}
+                  onClick={() => setEditingCollection({...newCollection})}
                   className="btn-primary"
                 >
                   Nueva Colección
@@ -517,7 +883,7 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
               <div className="panel-header">
                 <h3>Gestión de Joyas</h3>
                 <button 
-                  onClick={() => setEditingJewelry(newJewelry)}
+                  onClick={() => setEditingJewelry({...newJewelry})}
                   className="btn-primary"
                 >
                   Nueva Joya
@@ -682,6 +1048,85 @@ const ParallaxSection = ({ children, speed = 0.5, className = '' }) => {
   );
 };
 
+// Componente de Redes Sociales
+const SocialLinks = ({ config }) => {
+  const socialIcons = {
+    facebook: '📘',
+    instagram: '📷',
+    tiktok: '🎵',
+    whatsapp: '💬',
+    youtube: '📺',
+    twitter: '🐦'
+  };
+
+  const openSocialLink = (type, url) => {
+    if (type === 'whatsapp') {
+      window.open(`https://wa.me/${url.replace(/[^0-9]/g, '')}`, '_blank');
+    } else {
+      window.open(url, '_blank');
+    }
+  };
+
+  return (
+    <div className="social-links">
+      {config.social_facebook_enabled && config.social_facebook && (
+        <button 
+          onClick={() => openSocialLink('facebook', config.social_facebook)}
+          className="social-link facebook clickable"
+          title="Facebook"
+        >
+          {socialIcons.facebook}
+        </button>
+      )}
+      {config.social_instagram_enabled && config.social_instagram && (
+        <button 
+          onClick={() => openSocialLink('instagram', config.social_instagram)}
+          className="social-link instagram clickable"
+          title="Instagram"
+        >
+          {socialIcons.instagram}
+        </button>
+      )}
+      {config.social_tiktok_enabled && config.social_tiktok && (
+        <button 
+          onClick={() => openSocialLink('tiktok', config.social_tiktok)}
+          className="social-link tiktok clickable"
+          title="TikTok"
+        >
+          {socialIcons.tiktok}
+        </button>
+      )}
+      {config.social_whatsapp_enabled && config.social_whatsapp && (
+        <button 
+          onClick={() => openSocialLink('whatsapp', config.social_whatsapp)}
+          className="social-link whatsapp clickable"
+          title="WhatsApp"
+        >
+          {socialIcons.whatsapp}
+        </button>
+      )}
+      {config.social_youtube_enabled && config.social_youtube && (
+        <button 
+          onClick={() => openSocialLink('youtube', config.social_youtube)}
+          className="social-link youtube clickable"
+          title="YouTube"
+        >
+          {socialIcons.youtube}
+        </button>
+      )}
+      {config.social_twitter_enabled && config.social_twitter && (
+        <button 
+          onClick={() => openSocialLink('twitter', config.social_twitter)}
+          className="social-link twitter clickable"
+          title="Twitter"
+        >
+          {socialIcons.twitter}
+        </button>
+      )}
+    </div>
+  );
+};
+
 // Componente principal de la aplicación
 const JewelryApp = () => {
   const [siteConfig, setSiteConfig] = useState(null);
@@ -690,6 +1135,8 @@ const JewelryApp = () => {
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [showImageEditor, setShowImageEditor] = useState(false);
+  const [editingImage, setEditingImage] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showHiddenZone, setShowHiddenZone] = useState(false);
   const [hiddenClicks, setHiddenClicks] = useState(0);
@@ -933,6 +1380,24 @@ const JewelryApp = () => {
     );
   };
 
+  const openImageEditor = (imageBase64, itemId = null, collectionId = null) => {
+    setEditingImage({ base64: imageBase64, itemId, collectionId });
+    setShowImageEditor(true);
+  };
+
+  const saveEditedImage = (imageBase64, filters) => {
+    // La imagen ya se guarda en el backend desde el ImageEditor
+    // Aquí solo actualizamos la UI local
+    if (editingImage?.itemId) {
+      loadJewelryItems();
+    } else if (editingImage?.collectionId) {
+      loadCollections();
+    }
+    
+    setShowImageEditor(false);
+    setEditingImage(null);
+  };
+
   if (!siteConfig) {
     return (
       <div className="loading-screen">
@@ -973,24 +1438,24 @@ const JewelryApp = () => {
         </ParallaxSection>
         <div className="hero-content">
           <ScrollReveal direction="up" delay={300}>
-            <h1 className="hero-title">{siteConfig.artisan_name}</h1>
+            <h1 className="hero-title">{siteConfig.hero_title || siteConfig.artisan_name}</h1>
           </ScrollReveal>
           <ScrollReveal direction="up" delay={600}>
             <div className="hero-subtitle">
               <span className="subtitle-line"></span>
-              <span className="subtitle-text">Joyería Artesanal de Alto Standing</span>
+              <span className="subtitle-text">{siteConfig.site_subtitle || 'Joyería Artesanal de Alto Standing'}</span>
               <span className="subtitle-line"></span>
             </div>
           </ScrollReveal>
           <ScrollReveal direction="up" delay={900}>
             <p className="hero-description">
-              {siteConfig.artisan_story}
+              {siteConfig.hero_description || siteConfig.artisan_story}
             </p>
           </ScrollReveal>
           <ScrollReveal direction="up" delay={1200}>
             <div className="hero-cta">
               <button 
-                className="cta-button"
+                className="cta-button clickable"
                 onClick={() => document.getElementById('collections').scrollIntoView({ behavior: 'smooth' })}
               >
                 Explorar Colecciones
@@ -1006,8 +1471,8 @@ const JewelryApp = () => {
         <div className="section-container">
           <ScrollReveal direction="up" delay={200}>
             <div className="section-header">
-              <h2 className="section-title">Nuestras Colecciones</h2>
-              <div className="section-subtitle">Cada pieza cuenta una historia única</div>
+              <h2 className="section-title">{siteConfig.collections_title || 'Nuestras Colecciones'}</h2>
+              <div className="section-subtitle">{siteConfig.collections_subtitle || 'Cada pieza cuenta una historia única'}</div>
             </div>
           </ScrollReveal>
           
@@ -1027,6 +1492,17 @@ const JewelryApp = () => {
                     <div className="collection-overlay">
                       <div className="overlay-content">
                         <span className="view-collection">Ver Colección</span>
+                        {isAuthenticated && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openImageEditor(collection.image_base64, null, collection.id);
+                            }}
+                            className="edit-image-btn"
+                          >
+                            Editar Imagen
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1072,6 +1548,14 @@ const JewelryApp = () => {
                       className="jewelry-image"
                     />
                     <div className="jewelry-shine-effect"></div>
+                    {isAuthenticated && (
+                      <button
+                        onClick={() => openImageEditor(item.image_base64, item.id)}
+                        className="edit-image-btn-small"
+                      >
+                        Editar
+                      </button>
+                    )}
                   </div>
                   <div className="jewelry-content">
                     <h4 className="jewelry-name">{item.name}</h4>
@@ -1084,20 +1568,20 @@ const JewelryApp = () => {
         </div>
       )}
 
-      {/* Footer elegante */}
+      {/* Footer elegante personalizable */}
       <footer className="footer-elegant">
         <div className="footer-content">
           <div className="footer-grid">
             <ScrollReveal direction="up" delay={200}>
               <div className="footer-section">
-                <h3 className="footer-title">{siteConfig.artisan_name}</h3>
+                <h3 className="footer-title">{siteConfig.footer_title_1 || 'Sobre Nosotros'}</h3>
                 <p className="footer-story">{siteConfig.artisan_story}</p>
               </div>
             </ScrollReveal>
             
             <ScrollReveal direction="up" delay={400}>
               <div className="footer-section">
-                <h3 className="footer-title">Contacto</h3>
+                <h3 className="footer-title">{siteConfig.footer_title_2 || 'Contacto'}</h3>
                 <div className="contact-info">
                   <p className="contact-item">{siteConfig.artisan_contact}</p>
                   <p className="contact-item">{siteConfig.artisan_phone}</p>
@@ -1108,8 +1592,9 @@ const JewelryApp = () => {
             
             <ScrollReveal direction="up" delay={600}>
               <div className="footer-section">
-                <h3 className="footer-title">Síguenos</h3>
-                <p className="footer-follow">Joyería artesanal de la más alta calidad, creada con pasión y dedicación.</p>
+                <h3 className="footer-title">{siteConfig.footer_title_3 || 'Síguenos'}</h3>
+                <p className="footer-follow">{siteConfig.footer_text_3 || 'Conecta con nosotros en redes sociales'}</p>
+                <SocialLinks config={siteConfig} />
               </div>
             </ScrollReveal>
           </div>
@@ -1117,7 +1602,7 @@ const JewelryApp = () => {
           <div className="footer-bottom">
             <div className="footer-divider"></div>
             <p className="footer-copyright">
-              &copy; 2025 {siteConfig.site_name}. Todos los derechos reservados.
+              &copy; 2025 {siteConfig.site_name}. {siteConfig.footer_copyright || 'Todos los derechos reservados.'}
             </p>
           </div>
         </div>
@@ -1140,19 +1625,32 @@ const JewelryApp = () => {
         onJewelryUpdate={loadJewelryItems}
       />
 
-      {/* Admin Access Button */}
+      {showImageEditor && (
+        <ImageEditor
+          imageBase64={editingImage?.base64}
+          itemId={editingImage?.itemId}
+          collectionId={editingImage?.collectionId}
+          onSave={saveEditedImage}
+          onClose={() => {
+            setShowImageEditor(false);
+            setEditingImage(null);
+          }}
+        />
+      )}
+
+      {/* Admin Access Button - SOLO DESPUÉS DE AUTENTICACIÓN */}
       {isAuthenticated && (
         <div className="admin-float-button">
           <button
             onClick={() => setShowAdminPanel(!showAdminPanel)}
-            className="float-admin-btn"
+            className="float-admin-btn clickable"
           >
             {showAdminPanel ? '×' : '⚙'}
           </button>
           
           {showAdminPanel && (
             <div className="admin-quick-menu">
-              <button onClick={logout} className="logout-btn">
+              <button onClick={logout} className="logout-btn clickable">
                 Cerrar Sesión
               </button>
             </div>

@@ -278,7 +278,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   letter-spacing: 1px;
   text-transform: uppercase;
   border-radius: 50px;
-  cursor: pointer;
+  cursor: none;
   transition: var(--transition-smooth);
   box-shadow: var(--shadow-elegant);
   display: inline-flex;
@@ -377,7 +377,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   overflow: hidden;
   box-shadow: 0 10px 40px rgba(0,0,0,0.08);
   transition: var(--transition-smooth);
-  cursor: pointer;
+  cursor: none;
   position: relative;
 }
 
@@ -413,8 +413,10 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   opacity: 0;
   transition: var(--transition-smooth);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 1rem;
 }
 
 .collection-card-elegant:hover .collection-overlay {
@@ -431,6 +433,43 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
+}
+
+.edit-image-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: none;
+  transition: var(--transition-fast);
+}
+
+.edit-image-btn:hover {
+  background: white;
+  color: #d4af37;
+}
+
+.edit-image-btn-small {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(212, 175, 55, 0.9);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: none;
+  transition: var(--transition-fast);
+  opacity: 0;
+}
+
+.jewelry-card-elegant:hover .edit-image-btn-small {
+  opacity: 1;
 }
 
 .collection-content {
@@ -544,7 +583,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   border: none;
   font-size: 2rem;
   color: #999;
-  cursor: pointer;
+  cursor: none;
   transition: var(--transition-fast);
   width: 40px;
   height: 40px;
@@ -640,6 +679,88 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   line-height: 1.5;
 }
 
+/* Image Editor Modal */
+.image-editor-modal {
+  width: 100%;
+  max-width: 800px;
+  padding: 2rem;
+}
+
+.image-editor-content {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.image-preview-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-preview-large {
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.controls-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.control-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: #ddd;
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #d4af37, #f4e4a6);
+  cursor: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: var(--transition-fast);
+}
+
+.range-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+.range-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #d4af37, #f4e4a6);
+  cursor: none;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
 /* Admin Panel Styles */
 .login-modal {
   width: 100%;
@@ -668,6 +789,22 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   gap: 0.5rem;
 }
 
+.form-group.social-group {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.social-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+}
+
 .form-group label {
   font-weight: 500;
   color: #333;
@@ -692,6 +829,11 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
 }
 
+.form-input:disabled {
+  background: #f5f5f5;
+  color: #999;
+}
+
 .form-actions {
   display: flex;
   gap: 1rem;
@@ -706,7 +848,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
-  cursor: pointer;
+  cursor: none;
   transition: var(--transition-fast);
   flex: 1;
 }
@@ -719,6 +861,11 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+}
+
+.btn-primary.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .btn-secondary {
@@ -777,7 +924,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   border: none;
   font-size: 2rem;
   color: #999;
-  cursor: pointer;
+  cursor: none;
   transition: var(--transition-fast);
   width: 40px;
   height: 40px;
@@ -796,18 +943,20 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   display: flex;
   border-bottom: 1px solid #eee;
   background: #fafafa;
+  overflow-x: auto;
 }
 
 .tab {
   background: none;
   border: none;
-  padding: 1rem 2rem;
+  padding: 1rem 1.5rem;
   font-size: 1rem;
   font-weight: 600;
   color: #666;
-  cursor: pointer;
+  cursor: none;
   transition: var(--transition-fast);
   border-bottom: 3px solid transparent;
+  white-space: nowrap;
 }
 
 .tab:hover {
@@ -928,7 +1077,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 600;
-  cursor: pointer;
+  cursor: none;
   transition: var(--transition-fast);
   flex: 1;
 }
@@ -1013,6 +1162,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   line-height: 1.7;
   color: #ccc;
   font-size: 1rem;
+  margin-bottom: 1rem;
 }
 
 .contact-info {
@@ -1044,6 +1194,43 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   color: #999;
   font-size: 0.9rem;
 }
+
+/* Social Links */
+.social-links {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.social-link {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: none;
+  transition: var(--transition-fast);
+  backdrop-filter: blur(10px);
+}
+
+.social-link:hover {
+  background: #d4af37;
+  border-color: #d4af37;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+}
+
+.social-link.facebook:hover { background: #1877f2; border-color: #1877f2; }
+.social-link.instagram:hover { background: #e4405f; border-color: #e4405f; }
+.social-link.tiktok:hover { background: #000; border-color: #000; }
+.social-link.whatsapp:hover { background: #25d366; border-color: #25d366; }
+.social-link.youtube:hover { background: #ff0000; border-color: #ff0000; }
+.social-link.twitter:hover { background: #1da1f2; border-color: #1da1f2; }
 
 /* Admin Zone Styles Mejorados */
 .admin-zone {
@@ -1183,7 +1370,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   border: none;
   border-radius: 50%;
   font-size: 1.5rem;
-  cursor: pointer;
+  cursor: none;
   transition: var(--transition-fast);
   box-shadow: var(--shadow-elegant);
   display: flex;
@@ -1214,7 +1401,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 0.9rem;
-  cursor: pointer;
+  cursor: none;
   transition: var(--transition-fast);
   width: 100%;
 }
@@ -1283,6 +1470,15 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   .jewelry-grid {
     grid-template-columns: 1fr;
   }
+
+  .image-editor-content {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .social-links {
+    justify-content: center;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1345,7 +1541,7 @@ textarea:focus-visible {
 }
 
 .clickable {
-  cursor: pointer;
+  cursor: none;
 }
 
 /* Print styles */

@@ -1394,7 +1394,7 @@ const JewelryApp = () => {
             {collections.map((collection, index) => (
               <ScrollReveal key={collection.id} direction="up" delay={200 * (index + 1)}>
                 <div 
-                  className="collection-card-elegant clickable"
+                  className="collection-card-elegant"
                   onClick={() => setSelectedCollection(collection)}
                 >
                   <div className="collection-image-container">

@@ -986,7 +986,7 @@ const SocialLinks = ({ config }) => {
       {config.social_facebook_enabled && config.social_facebook && (
         <button 
           onClick={() => openSocialLink('facebook', config.social_facebook)}
-          className="social-link facebook clickable"
+          className="social-link facebook"
           title="Facebook"
         >
           {socialIcons.facebook}

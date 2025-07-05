@@ -343,7 +343,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   overflow: hidden;
   box-shadow: 0 10px 40px rgba(0,0,0,0.08);
   transition: var(--transition-smooth);
-  cursor: none;
+  cursor: pointer;
   position: relative;
 }
 

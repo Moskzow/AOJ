@@ -20,7 +20,8 @@ test_results = {
     "config": {"success": False, "message": ""},
     "demo_data": {"success": False, "message": ""},
     "collections": {"success": False, "message": ""},
-    "jewelry_items": {"success": False, "message": ""}
+    "jewelry_items": {"success": False, "message": ""},
+    "image_editor": {"success": False, "message": ""}
 }
 
 # Helper functions

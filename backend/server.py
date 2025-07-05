@@ -362,7 +362,7 @@ async def save_edited_image(
                 {"id": item_id},
                 {"$set": {"image_base64": edited_image_base64}}
             )
-            if result.modified_count == 0:
+            if result.matched_count == 0:
                 raise HTTPException(status_code=404, detail="Jewelry item not found")
             return {"message": "Jewelry item image updated successfully"}
             
@@ -372,7 +372,7 @@ async def save_edited_image(
                 {"id": collection_id},
                 {"$set": {"image_base64": edited_image_base64}}
             )
-            if result.modified_count == 0:
+            if result.matched_count == 0:
                 raise HTTPException(status_code=404, detail="Collection not found")
             return {"message": "Collection image updated successfully"}
         

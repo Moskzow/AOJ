@@ -338,12 +338,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Fix editConfig state initialization bug"
-    - "Random admin button positioning"
-    - "Hidden admin zone with 30-second timer"
-    - "Authentication context and login modal"
-    - "Elegant jewelry catalog UI with responsive design"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

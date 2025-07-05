@@ -1143,6 +1143,7 @@ const JewelryApp = () => {
   const [hiddenClicks, setHiddenClicks] = useState(0);
   const [isTimerActive, setIsTimerActive] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [randomButtonPosition, setRandomButtonPosition] = useState('right'); // 'left' or 'right'
   const { isAuthenticated, logout } = useAuth();
 
   // Color schemes

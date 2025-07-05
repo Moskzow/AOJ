@@ -269,11 +269,19 @@ const ImageEditor = ({ imageBase64, onSave, onClose, itemId, collectionId }) => 
 // Panel de Administración Completo y Expandido
 const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, onCollectionsUpdate, jewelryItems, onJewelryUpdate }) => {
   const [activeTab, setActiveTab] = useState('general');
-  const [editConfig, setEditConfig] = useState(siteConfig || {});
+  const [editConfig, setEditConfig] = useState({});
   const [editingCollection, setEditingCollection] = useState(null);
   const [editingJewelry, setEditingJewelry] = useState(null);
   const [newCollection, setNewCollection] = useState({ name: '', description: '', image_base64: '', position: 0 });
   const [newJewelry, setNewJewelry] = useState({ name: '', description: '', image_base64: '', collection_id: '', position: 0 });
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Inicializar editConfig cuando se abre el panel o cambia siteConfig
+  useEffect(() => {
+    if (siteConfig && isOpen) {
+      setEditConfig({...siteConfig});
+    }
+  }, [siteConfig, isOpen]);
 
   const handleImageUpload = (e, callback) => {
     const file = e.target.files[0];
@@ -287,12 +295,23 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
   };
 
   const saveConfig = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+    
     try {
-      await axios.put(`${API}/config`, editConfig);
-      onConfigUpdate();
+      console.log('Guardando configuración:', editConfig);
+      const response = await axios.put(`${API}/config`, editConfig);
+      console.log('Respuesta del servidor:', response.data);
+      
+      // Recargar la configuración desde el servidor
+      await onConfigUpdate();
       alert('Configuración guardada exitosamente');
     } catch (error) {
-      alert('Error al guardar configuración');
+      console.error('Error al guardar configuración:', error);
+      console.error('Detalles del error:', error.response?.data);
+      alert(`Error al guardar configuración: ${error.response?.data?.detail || error.message}`);
+    } finally {
+      setIsSaving(false);
     }
   };
 

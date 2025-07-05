@@ -1308,19 +1308,29 @@ const JewelryApp = () => {
   };
 
   const renderHiddenZone = () => {
-    const position = siteConfig?.hidden_zone_position || 'bottom-right';
-    const positionClasses = {
-      'top-left': 'top-4 left-4',
-      'top-right': 'top-4 right-4',
-      'bottom-left': 'bottom-4 left-4',
-      'bottom-right': 'bottom-4 right-4'
+    // Generar posiciones aleatorias para los laterales
+    const randomHeight = Math.floor(Math.random() * 60) + 20; // Entre 20% y 80% de altura
+    const leftPosition = {
+      left: '20px',
+      top: `${randomHeight}%`,
+      transform: 'translateY(-50%)'
     };
+    const rightPosition = {
+      right: '20px', 
+      top: `${randomHeight}%`,
+      transform: 'translateY(-50%)'
+    };
+    
+    const buttonPosition = randomButtonPosition === 'left' ? leftPosition : rightPosition;
+    
+    // Posición fija para el área de clics (siempre esquina inferior derecha)
+    const clickZonePosition = 'bottom-4 right-4';
 
     return (
       <>
-        {/* Zona invisible para activar (5 clics) */}
+        {/* Zona invisible para activar (5 clics) - siempre en esquina inferior derecha */}
         <div
-          className={`fixed ${positionClasses[position]} w-16 h-16 cursor-pointer z-40`}
+          className={`fixed ${clickZonePosition} w-16 h-16 cursor-pointer z-40`}
           onClick={handleHiddenZoneClick}
           onTouchEnd={handleHiddenZoneClick} // Soporte para móviles
           title="" // Sin tooltip para mantener secreto
@@ -1330,9 +1340,12 @@ const JewelryApp = () => {
           }}
         />
         
-        {/* Botón de admin solo visible después del timer */}
+        {/* Botón de admin solo visible después del timer - posición aleatoria */}
         {showHiddenZone && (
-          <div className={`fixed ${positionClasses[position]} z-50`}>
+          <div 
+            className="fixed z-50" 
+            style={buttonPosition}
+          >
             <button
               onClick={() => setShowLoginModal(true)}
               className="admin-access-btn animate-bounce"
@@ -1345,7 +1358,7 @@ const JewelryApp = () => {
         {/* Indicador visual sutil de progreso (opcional, solo para desarrollo) */}
         {hiddenClicks > 0 && hiddenClicks < 5 && (
           <div 
-            className={`fixed ${positionClasses[position]} z-45 pointer-events-none`}
+            className={`fixed ${clickZonePosition} z-45 pointer-events-none`}
             style={{ transform: 'translate(20px, -20px)' }}
           >
             <div className="progress-indicator">
@@ -1362,7 +1375,7 @@ const JewelryApp = () => {
         {/* Timer visual cuando está activo */}
         {isTimerActive && (
           <div 
-            className={`fixed ${positionClasses[position]} z-45 pointer-events-none`}
+            className={`fixed ${clickZonePosition} z-45 pointer-events-none`}
             style={{ transform: 'translate(-30px, -30px)' }}
           >
             <div className="timer-indicator">

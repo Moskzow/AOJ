@@ -435,71 +435,79 @@ def test_image_editor_save(token=None, collection_id=None):
             print_result("Image Editor Save", False, f"Exception getting collections: {str(e)}")
             return
     
-    # Get a jewelry item ID
-    item_id = None
-    try:
-        response = requests.get(f"{API_URL}/collections/{collection_id}/items")
-        if response.status_code == 200:
-            items = response.json()
-            if len(items) > 0:
-                item_id = items[0]["id"]
-            else:
-                # Try to get any jewelry item
-                response = requests.get(f"{API_URL}/jewelry-items")
-                if response.status_code == 200:
-                    items = response.json()
-                    if len(items) > 0:
-                        item_id = items[0]["id"]
-                    else:
-                        print_result("Image Editor Save", False, "No jewelry items available for testing image editor")
-                        return
-                else:
-                    print_result("Image Editor Save", False, "Failed to get jewelry items for testing image editor")
-                    return
-        else:
-            print_result("Image Editor Save", False, "Failed to get collection items for testing image editor")
-            return
-    except Exception as e:
-        print_result("Image Editor Save", False, f"Exception getting jewelry items: {str(e)}")
-        return
-    
-    # Test POST /api/save-edited-image for a jewelry item
+    # Create a test jewelry item first
     try:
         headers = {"Authorization": f"Bearer {token}"}
-        edited_image_data = {
-            "item_id": item_id,
-            "image_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCAABAAEDAREAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhADEAAAAVSf/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABBQJ//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPwF//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPwF//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQAGPwJ//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPyF//9oADAMBAAIAAwAAABCf/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPxB//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPxB//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxB//9k="
+        new_item = {
+            "name": "Test Item for Image Editor",
+            "description": "A jewelry item created for testing image editor",
+            "image_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCAABAAEDAREAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhADEAAAAVSf/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABBQJ//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPwF//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPwF//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQAGPwJ//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPyF//9oADAMBAAIAAwAAABCf/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPxB//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPxB//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxB//9k=",
+            "collection_id": collection_id,
+            "position": 99
         }
         
         response = requests.post(
-            f"{API_URL}/save-edited-image",
+            f"{API_URL}/jewelry-items",
             headers=headers,
-            json=edited_image_data
+            json=new_item
         )
         
         if response.status_code == 200:
-            print_result("POST /api/save-edited-image (jewelry item)", True, "Successfully saved edited image for jewelry item")
-            
-            # Test POST /api/save-edited-image for a collection
-            edited_collection_image_data = {
-                "collection_id": collection_id,
-                "image_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCAABAAEDAREAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhADEAAAAVSf/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABBQJ//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPwF//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPwF//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQAGPwJ//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPyF//9oADAMBAAIAAwAAABCf/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPxB//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPxB//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxB//9k="
-            }
-            
-            collection_response = requests.post(
-                f"{API_URL}/save-edited-image",
-                headers=headers,
-                json=edited_collection_image_data
-            )
-            
-            if collection_response.status_code == 200:
-                print_result("POST /api/save-edited-image (collection)", True, "Successfully saved edited image for collection")
-                test_results["image_editor"]["success"] = True
-                test_results["image_editor"]["message"] = "Image editor save functionality works for both jewelry items and collections"
+            created_item = response.json()
+            if "id" in created_item:
+                item_id = created_item["id"]
+                print_result("Created test jewelry item", True, f"Successfully created jewelry item with ID: {item_id}")
+                
+                # Test POST /api/save-edited-image for a jewelry item
+                edited_image_data = {
+                    "item_id": item_id,
+                    "image_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCAABAAEDAREAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhADEAAAAVSf/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABBQJ//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPwF//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPwF//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQAGPwJ//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPyF//9oADAMBAAIAAwAAABCf/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPxB//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPxB//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxB//9k="
+                }
+                
+                save_response = requests.post(
+                    f"{API_URL}/save-edited-image",
+                    headers=headers,
+                    json=edited_image_data
+                )
+                
+                if save_response.status_code == 200:
+                    print_result("POST /api/save-edited-image (jewelry item)", True, "Successfully saved edited image for jewelry item")
+                    
+                    # Test POST /api/save-edited-image for a collection
+                    edited_collection_image_data = {
+                        "collection_id": collection_id,
+                        "image_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCAABAAEDAREAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhADEAAAAVSf/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABBQJ//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPwF//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPwF//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQAGPwJ//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPyF//9oADAMBAAIAAwAAABCf/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPxB//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPxB//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxB//9k="
+                    }
+                    
+                    collection_response = requests.post(
+                        f"{API_URL}/save-edited-image",
+                        headers=headers,
+                        json=edited_collection_image_data
+                    )
+                    
+                    if collection_response.status_code == 200:
+                        print_result("POST /api/save-edited-image (collection)", True, "Successfully saved edited image for collection")
+                        test_results["image_editor"]["success"] = True
+                        test_results["image_editor"]["message"] = "Image editor save functionality works for both jewelry items and collections"
+                    else:
+                        print_result("POST /api/save-edited-image (collection)", False, f"Failed with status code: {collection_response.status_code}")
+                else:
+                    print_result("POST /api/save-edited-image (jewelry item)", False, f"Failed with status code: {save_response.status_code}")
+                
+                # Clean up - delete the test item
+                delete_response = requests.delete(
+                    f"{API_URL}/jewelry-items/{item_id}",
+                    headers=headers
+                )
+                
+                if delete_response.status_code == 200:
+                    print_result("Cleanup test jewelry item", True, "Successfully deleted test jewelry item")
+                else:
+                    print_result("Cleanup test jewelry item", False, f"Failed to delete test jewelry item: {delete_response.status_code}")
             else:
-                print_result("POST /api/save-edited-image (collection)", False, f"Failed with status code: {collection_response.status_code}")
+                print_result("Created test jewelry item", False, "No ID in created jewelry item response")
         else:
-            print_result("POST /api/save-edited-image (jewelry item)", False, f"Failed with status code: {response.status_code}")
+            print_result("Created test jewelry item", False, f"Failed to create test jewelry item: {response.status_code}")
     except Exception as e:
         print_result("Image Editor Save", False, f"Exception: {str(e)}")
 

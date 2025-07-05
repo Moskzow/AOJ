@@ -273,15 +273,18 @@ frontend:
 
   - task: "Adaptive logo with scroll effect"
     implemented: true
-    working: "needs_testing"
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "needs_testing"
         agent: "main"
         comment: "Logo resizes and adapts on scroll with smooth transitions"
+      - working: true
+        agent: "testing"
+        comment: "Verified that the logo resizes and adapts on scroll with smooth transitions."
 
   - task: "Image editor with filters"
     implemented: true

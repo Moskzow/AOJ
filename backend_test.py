@@ -538,6 +538,9 @@ def main():
     # Test jewelry items CRUD
     test_jewelry_items(token, collection_id)
     
+    # Test image editor save
+    test_image_editor_save(token, collection_id)
+    
     # Print summary
     success = print_summary()
     

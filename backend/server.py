@@ -342,6 +342,46 @@ async def delete_jewelry_item(item_id: str, token_data: dict = Depends(verify_to
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# Image editing endpoint
+@api_router.post("/save-edited-image")
+async def save_edited_image(
+    image_data: dict,
+    token_data: dict = Depends(verify_token)
+):
+    try:
+        item_id = image_data.get('item_id')
+        collection_id = image_data.get('collection_id')
+        edited_image_base64 = image_data.get('image_base64')
+        
+        if not edited_image_base64:
+            raise HTTPException(status_code=400, detail="No image data provided")
+        
+        if item_id:
+            # Update jewelry item image
+            result = await db.jewelry_items.update_one(
+                {"id": item_id},
+                {"$set": {"image_base64": edited_image_base64}}
+            )
+            if result.modified_count == 0:
+                raise HTTPException(status_code=404, detail="Jewelry item not found")
+            return {"message": "Jewelry item image updated successfully"}
+            
+        elif collection_id:
+            # Update collection image
+            result = await db.collections.update_one(
+                {"id": collection_id},
+                {"$set": {"image_base64": edited_image_base64}}
+            )
+            if result.modified_count == 0:
+                raise HTTPException(status_code=404, detail="Collection not found")
+            return {"message": "Collection image updated successfully"}
+        
+        else:
+            raise HTTPException(status_code=400, detail="No item_id or collection_id provided")
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Initialize demo data
 @api_router.post("/init-demo-data")
 async def init_demo_data():

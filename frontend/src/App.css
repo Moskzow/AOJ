@@ -1479,9 +1479,6 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
-.clickable {
-}
-
 /* Print styles */
 @media print {
   .admin-float-button,

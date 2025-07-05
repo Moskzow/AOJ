@@ -37,12 +37,9 @@ body {
   /* Cursor normal restaurado */
 }
 
-/* Custom Cursor ELIMINADO - Causaba problemas */
+/* Custom Cursor ELIMINADO COMPLETAMENTE */
 
-/* Restaurar cursors normales en elementos interactivos */
-button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-button {
-  cursor: pointer !important;
-}
+/* SIN modificaciones de cursor - valores por defecto del navegador */
 
 /* Loading Screen */
 .loading-screen {

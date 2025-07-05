@@ -278,15 +278,18 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
 
   // Inicializar editConfig cuando se abre el panel o cambia siteConfig
   useEffect(() => {
-    if (siteConfig && isOpen) {
+    console.log('Effect ejecutándose - siteConfig:', siteConfig, 'isOpen:', isOpen);
+    if (siteConfig && isOpen && Object.keys(siteConfig).length > 0) {
       console.log('Inicializando editConfig con:', siteConfig);
-      setEditConfig({...siteConfig});
+      const configCopy = JSON.parse(JSON.stringify(siteConfig)); // Deep copy
+      setEditConfig(configCopy);
     }
   }, [siteConfig, isOpen]);
 
   // Debug: Log editConfig changes
   useEffect(() => {
     console.log('editConfig actualizado:', editConfig);
+    console.log('Claves en editConfig:', Object.keys(editConfig));
   }, [editConfig]);
 
   const handleImageUpload = (e, callback) => {

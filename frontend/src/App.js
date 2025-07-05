@@ -669,6 +669,8 @@ const JewelryApp = () => {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showHiddenZone, setShowHiddenZone] = useState(false);
+  const [hiddenClicks, setHiddenClicks] = useState(0);
+  const [isTimerActive, setIsTimerActive] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const { isAuthenticated, logout } = useAuth();
 

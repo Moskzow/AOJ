@@ -626,8 +626,8 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
                   />
                 </div>
               </div>
-              <button onClick={saveConfig} className="btn-primary">
-                Guardar Textos Personalizados
+              <button onClick={saveConfig} className={`btn-primary ${isSaving ? 'loading' : ''}`} disabled={isSaving}>
+                {isSaving ? 'Guardando...' : 'Guardar Textos Personalizados'}
               </button>
             </div>
           )}

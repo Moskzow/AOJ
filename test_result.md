@@ -315,15 +315,18 @@ frontend:
 
   - task: "Elegant footer with editable artisan information"
     implemented: true
-    working: "needs_testing"
+    working: true
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "low"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "needs_testing"
         agent: "main"
         comment: "Footer displays artisan contact info and story from site config"
+      - working: true
+        agent: "testing"
+        comment: "Verified that the footer displays artisan contact information and story from site configuration."
 
 metadata:
   created_by: "main_agent"

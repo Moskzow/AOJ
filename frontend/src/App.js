@@ -995,7 +995,7 @@ const SocialLinks = ({ config }) => {
       {config.social_instagram_enabled && config.social_instagram && (
         <button 
           onClick={() => openSocialLink('instagram', config.social_instagram)}
-          className="social-link instagram clickable"
+          className="social-link instagram"
           title="Instagram"
         >
           {socialIcons.instagram}
@@ -1004,7 +1004,7 @@ const SocialLinks = ({ config }) => {
       {config.social_tiktok_enabled && config.social_tiktok && (
         <button 
           onClick={() => openSocialLink('tiktok', config.social_tiktok)}
-          className="social-link tiktok clickable"
+          className="social-link tiktok"
           title="TikTok"
         >
           {socialIcons.tiktok}
@@ -1013,7 +1013,7 @@ const SocialLinks = ({ config }) => {
       {config.social_whatsapp_enabled && config.social_whatsapp && (
         <button 
           onClick={() => openSocialLink('whatsapp', config.social_whatsapp)}
-          className="social-link whatsapp clickable"
+          className="social-link whatsapp"
           title="WhatsApp"
         >
           {socialIcons.whatsapp}
@@ -1022,7 +1022,7 @@ const SocialLinks = ({ config }) => {
       {config.social_youtube_enabled && config.social_youtube && (
         <button 
           onClick={() => openSocialLink('youtube', config.social_youtube)}
-          className="social-link youtube clickable"
+          className="social-link youtube"
           title="YouTube"
         >
           {socialIcons.youtube}
@@ -1031,7 +1031,7 @@ const SocialLinks = ({ config }) => {
       {config.social_twitter_enabled && config.social_twitter && (
         <button 
           onClick={() => openSocialLink('twitter', config.social_twitter)}
-          className="social-link twitter clickable"
+          className="social-link twitter"
           title="Twitter"
         >
           {socialIcons.twitter}
@@ -1557,14 +1557,14 @@ const JewelryApp = () => {
         <div className="admin-float-button">
           <button
             onClick={() => setShowAdminPanel(!showAdminPanel)}
-            className="float-admin-btn clickable"
+            className="float-admin-btn"
           >
             {showAdminPanel ? '×' : '⚙'}
           </button>
           
           {showAdminPanel && (
             <div className="admin-quick-menu">
-              <button onClick={logout} className="logout-btn clickable">
+              <button onClick={logout} className="logout-btn">
                 Cerrar Sesión
               </button>
             </div>

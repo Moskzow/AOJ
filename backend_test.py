@@ -522,6 +522,7 @@ def test_image_editor_save(token=None, collection_id=None):
                         print_result("POST /api/save-edited-image (collection)", False, f"Failed with status code: {collection_response.status_code}")
                 else:
                     print_result("POST /api/save-edited-image (jewelry item)", False, f"Failed with status code: {save_response.status_code}")
+                    print_result("Response content", False, f"{save_response.text}")
                 
                 # Clean up - delete the test item
                 delete_response = requests.delete(

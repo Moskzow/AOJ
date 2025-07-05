@@ -125,9 +125,15 @@ def test_demo_data():
         response = requests.post(f"{API_URL}/init-demo-data")
         
         if response.status_code == 200:
-            print_result("POST /api/init-demo-data", True, "Successfully initialized demo data")
-            test_results["demo_data"]["success"] = True
-            test_results["demo_data"]["message"] = "Demo data initialized successfully"
+            data = response.json()
+            if "message" in data and data["message"] == "Demo data already exists":
+                print_result("POST /api/init-demo-data", True, "Demo data already exists (expected)")
+                test_results["demo_data"]["success"] = True
+                test_results["demo_data"]["message"] = "Demo data already exists"
+            else:
+                print_result("POST /api/init-demo-data", True, "Successfully initialized demo data")
+                test_results["demo_data"]["success"] = True
+                test_results["demo_data"]["message"] = "Demo data initialized successfully"
             
             # Verify collections were created
             collections_response = requests.get(f"{API_URL}/collections")

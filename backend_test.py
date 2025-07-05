@@ -410,6 +410,99 @@ def test_jewelry_items(token=None, collection_id=None):
     except Exception as e:
         print_result("Jewelry Items CRUD (authenticated)", False, f"Exception: {str(e)}")
 
+def test_image_editor_save(token=None, collection_id=None):
+    print_header("Testing Image Editor Save")
+    
+    if not token:
+        print_result("Image Editor Save", False, "Skipping test - no token available")
+        return
+    
+    if not collection_id:
+        # Try to get a collection ID
+        try:
+            response = requests.get(f"{API_URL}/collections")
+            if response.status_code == 200:
+                collections = response.json()
+                if len(collections) > 0:
+                    collection_id = collections[0]["id"]
+                else:
+                    print_result("Image Editor Save", False, "No collections available for testing image editor")
+                    return
+            else:
+                print_result("Image Editor Save", False, "Failed to get collections for testing image editor")
+                return
+        except Exception as e:
+            print_result("Image Editor Save", False, f"Exception getting collections: {str(e)}")
+            return
+    
+    # Get a jewelry item ID
+    item_id = None
+    try:
+        response = requests.get(f"{API_URL}/collections/{collection_id}/items")
+        if response.status_code == 200:
+            items = response.json()
+            if len(items) > 0:
+                item_id = items[0]["id"]
+            else:
+                # Try to get any jewelry item
+                response = requests.get(f"{API_URL}/jewelry-items")
+                if response.status_code == 200:
+                    items = response.json()
+                    if len(items) > 0:
+                        item_id = items[0]["id"]
+                    else:
+                        print_result("Image Editor Save", False, "No jewelry items available for testing image editor")
+                        return
+                else:
+                    print_result("Image Editor Save", False, "Failed to get jewelry items for testing image editor")
+                    return
+        else:
+            print_result("Image Editor Save", False, "Failed to get collection items for testing image editor")
+            return
+    except Exception as e:
+        print_result("Image Editor Save", False, f"Exception getting jewelry items: {str(e)}")
+        return
+    
+    # Test POST /api/save-edited-image for a jewelry item
+    try:
+        headers = {"Authorization": f"Bearer {token}"}
+        edited_image_data = {
+            "item_id": item_id,
+            "image_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCAABAAEDAREAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhADEAAAAVSf/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABBQJ//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPwF//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPwF//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQAGPwJ//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPyF//9oADAMBAAIAAwAAABCf/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPxB//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPxB//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxB//9k="
+        }
+        
+        response = requests.post(
+            f"{API_URL}/save-edited-image",
+            headers=headers,
+            json=edited_image_data
+        )
+        
+        if response.status_code == 200:
+            print_result("POST /api/save-edited-image (jewelry item)", True, "Successfully saved edited image for jewelry item")
+            
+            # Test POST /api/save-edited-image for a collection
+            edited_collection_image_data = {
+                "collection_id": collection_id,
+                "image_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCAABAAEDAREAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhADEAAAAVSf/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABBQJ//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPwF//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPwF//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQAGPwJ//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPyF//9oADAMBAAIAAwAAABCf/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPxB//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPxB//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxB//9k="
+            }
+            
+            collection_response = requests.post(
+                f"{API_URL}/save-edited-image",
+                headers=headers,
+                json=edited_collection_image_data
+            )
+            
+            if collection_response.status_code == 200:
+                print_result("POST /api/save-edited-image (collection)", True, "Successfully saved edited image for collection")
+                test_results["image_editor"]["success"] = True
+                test_results["image_editor"]["message"] = "Image editor save functionality works for both jewelry items and collections"
+            else:
+                print_result("POST /api/save-edited-image (collection)", False, f"Failed with status code: {collection_response.status_code}")
+        else:
+            print_result("POST /api/save-edited-image (jewelry item)", False, f"Failed with status code: {response.status_code}")
+    except Exception as e:
+        print_result("Image Editor Save", False, f"Exception: {str(e)}")
+
 def print_summary():
     print_header("TEST SUMMARY")
     

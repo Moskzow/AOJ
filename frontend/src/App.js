@@ -57,40 +57,67 @@ const useAuth = () => {
   return context;
 };
 
-// Cursor personalizado
+// Cursor personalizado mejorado
 const CustomCursor = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const cursorRef = useRef();
 
   useEffect(() => {
     const updatePosition = (e) => {
       setPosition({ x: e.clientX, y: e.clientY });
+      setIsVisible(true);
     };
 
-    const handleMouseEnter = () => setIsHovering(true);
-    const handleMouseLeave = () => setIsHovering(false);
+    const handleMouseEnter = (e) => {
+      if (e.target.matches('button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-button')) {
+        setIsHovering(true);
+      }
+    };
+    
+    const handleMouseLeave = (e) => {
+      if (e.target.matches('button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-button')) {
+        setIsHovering(false);
+      }
+    };
+
+    const handleMouseDown = () => {
+      if (cursorRef.current) {
+        cursorRef.current.style.transform = 'translate(-50%, -50%) scale(0.8)';
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (cursorRef.current) {
+        cursorRef.current.style.transform = `translate(-50%, -50%) scale(${isHovering ? '2' : '1'})`;
+      }
+    };
 
     window.addEventListener('mousemove', updatePosition);
-    
-    const hoverElements = document.querySelectorAll('button, a, .clickable');
-    hoverElements.forEach(el => {
-      el.addEventListener('mouseenter', handleMouseEnter);
-      el.addEventListener('mouseleave', handleMouseLeave);
-    });
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mouseenter', handleMouseEnter, true);
+    document.addEventListener('mouseleave', handleMouseLeave, true);
 
     return () => {
       window.removeEventListener('mousemove', updatePosition);
-      hoverElements.forEach(el => {
-        el.removeEventListener('mouseenter', handleMouseEnter);
-        el.removeEventListener('mouseleave', handleMouseLeave);
-      });
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mouseenter', handleMouseEnter, true);
+      document.removeEventListener('mouseleave', handleMouseLeave, true);
     };
-  }, []);
+  }, [isHovering]);
 
   return (
     <div 
-      className={`custom-cursor ${isHovering ? 'hovering' : ''}`}
-      style={{ left: position.x, top: position.y }}
+      ref={cursorRef}
+      className={`custom-cursor ${isHovering ? 'hovering' : ''} ${isVisible ? 'visible' : ''}`}
+      style={{ 
+        left: position.x, 
+        top: position.y,
+        transform: `translate(-50%, -50%) scale(${isHovering ? '2' : '1'})`
+      }}
     />
   );
 };

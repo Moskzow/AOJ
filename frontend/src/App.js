@@ -784,9 +784,49 @@ const JewelryApp = () => {
     return jewelryItems.filter(item => item.collection_id === collectionId);
   };
 
-  // Hidden zone handler
+  // Hidden zone handler mejorado - requiere 5 clics
   const handleHiddenZoneClick = () => {
-    setShowHiddenZone(true);
+    const newClickCount = hiddenClicks + 1;
+    setHiddenClicks(newClickCount);
+    
+    if (newClickCount >= 5) {
+      setIsTimerActive(true);
+      setHiddenClicks(0); // Reset counter
+      
+      // Feedback visual/haptic
+      if (navigator.vibrate) {
+        navigator.vibrate(200); // Vibración en móviles
+      }
+      
+      // Mostrar notificación temporal
+      const notification = document.createElement('div');
+      notification.textContent = 'Acceso administrativo activado. Espera 30 segundos...';
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(212, 175, 55, 0.9);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        z-index: 9999;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        animation: slideInRight 0.3s ease;
+      `;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        if (notification && notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 3000);
+    } else {
+      // Feedback sutil para clics restantes
+      const remaining = 5 - newClickCount;
+      console.log(`${remaining} clics restantes para activar admin`);
+    }
   };
 
   const renderHiddenZone = () => {

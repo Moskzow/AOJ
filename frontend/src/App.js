@@ -839,20 +839,74 @@ const JewelryApp = () => {
     };
 
     return (
-      <div
-        className={`fixed ${positionClasses[position]} w-8 h-8 cursor-pointer z-40 admin-zone`}
-        onClick={handleHiddenZoneClick}
-        title="Zona de administración"
-      >
+      <>
+        {/* Zona invisible para activar (5 clics) */}
+        <div
+          className={`fixed ${positionClasses[position]} w-16 h-16 cursor-pointer z-40`}
+          onClick={handleHiddenZoneClick}
+          onTouchEnd={handleHiddenZoneClick} // Soporte para móviles
+          title="" // Sin tooltip para mantener secreto
+          style={{ 
+            background: 'transparent',
+            border: 'none'
+          }}
+        />
+        
+        {/* Botón de admin solo visible después del timer */}
         {showHiddenZone && (
-          <button
-            onClick={() => setShowLoginModal(true)}
-            className="admin-access-btn"
-          >
-            Admin
-          </button>
+          <div className={`fixed ${positionClasses[position]} z-50`}>
+            <button
+              onClick={() => setShowLoginModal(true)}
+              className="admin-access-btn animate-bounce"
+            >
+              Admin
+            </button>
+          </div>
         )}
-      </div>
+        
+        {/* Indicador visual sutil de progreso (opcional, solo para desarrollo) */}
+        {hiddenClicks > 0 && hiddenClicks < 5 && (
+          <div 
+            className={`fixed ${positionClasses[position]} z-45 pointer-events-none`}
+            style={{ transform: 'translate(20px, -20px)' }}
+          >
+            <div className="progress-indicator">
+              {[...Array(5)].map((_, i) => (
+                <div 
+                  key={i} 
+                  className={`progress-dot ${i < hiddenClicks ? 'active' : ''}`} 
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Timer visual cuando está activo */}
+        {isTimerActive && (
+          <div 
+            className={`fixed ${positionClasses[position]} z-45 pointer-events-none`}
+            style={{ transform: 'translate(-30px, -30px)' }}
+          >
+            <div className="timer-indicator">
+              <div className="timer-circle">
+                <svg width="24" height="24" viewBox="0 0 24 24">
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="#d4af37"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeDasharray="62.83"
+                    strokeDashoffset="0"
+                    className="timer-circle-progress"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
     );
   };
 

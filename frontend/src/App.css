@@ -409,7 +409,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 600;
-  cursor: none;
+  cursor: pointer;
   transition: var(--transition-fast);
 }
 
@@ -429,7 +429,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   border-radius: 15px;
   font-size: 0.8rem;
   font-weight: 600;
-  cursor: none;
+  cursor: pointer;
   transition: var(--transition-fast);
   opacity: 0;
 }
@@ -549,7 +549,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   border: none;
   font-size: 2rem;
   color: #999;
-  cursor: none;
+  cursor: pointer;
   transition: var(--transition-fast);
   width: 40px;
   height: 40px;
@@ -708,7 +708,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   height: 20px;
   border-radius: 50%;
   background: linear-gradient(45deg, #d4af37, #f4e4a6);
-  cursor: none;
+  cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   transition: var(--transition-fast);
 }
@@ -722,7 +722,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   height: 20px;
   border-radius: 50%;
   background: linear-gradient(45deg, #d4af37, #f4e4a6);
-  cursor: none;
+  cursor: pointer;
   border: none;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
@@ -814,7 +814,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
-  cursor: none;
+  cursor: pointer;
   transition: var(--transition-fast);
   flex: 1;
 }
@@ -890,7 +890,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   border: none;
   font-size: 2rem;
   color: #999;
-  cursor: none;
+  cursor: pointer;
   transition: var(--transition-fast);
   width: 40px;
   height: 40px;
@@ -919,7 +919,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   font-size: 1rem;
   font-weight: 600;
   color: #666;
-  cursor: none;
+  cursor: pointer;
   transition: var(--transition-fast);
   border-bottom: 3px solid transparent;
   white-space: nowrap;
@@ -1043,7 +1043,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 600;
-  cursor: none;
+  cursor: pointer;
   transition: var(--transition-fast);
   flex: 1;
 }
@@ -1179,7 +1179,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  cursor: none;
+  cursor: pointer;
   transition: var(--transition-fast);
   backdrop-filter: blur(10px);
 }
@@ -1212,7 +1212,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   border-radius: 25px;
   font-weight: 600;
   font-size: 0.9rem;
-  cursor: none;
+  cursor: pointer;
   transition: var(--transition-fast);
   box-shadow: var(--shadow-elegant);
   text-transform: uppercase;
@@ -1336,7 +1336,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   border: none;
   border-radius: 50%;
   font-size: 1.5rem;
-  cursor: none;
+  cursor: pointer;
   transition: var(--transition-fast);
   box-shadow: var(--shadow-elegant);
   display: flex;
@@ -1367,7 +1367,7 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 0.9rem;
-  cursor: none;
+  cursor: pointer;
   transition: var(--transition-fast);
   width: 100%;
 }
@@ -1507,7 +1507,7 @@ textarea:focus-visible {
 }
 
 .clickable {
-  cursor: none;
+  cursor: pointer;
 }
 
 /* Print styles */

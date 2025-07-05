@@ -37,24 +37,45 @@ body {
   cursor: none; /* Hide default cursor for custom cursor */
 }
 
-/* Custom Cursor */
+/* Custom Cursor Mejorado */
 .custom-cursor {
   position: fixed;
   width: 20px;
   height: 20px;
-  background: var(--gold-primary);
+  background: linear-gradient(45deg, #d4af37, #f4e4a6);
   border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
-  transition: all 0.1s ease;
+  transition: all 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+  opacity: 0;
   mix-blend-mode: difference;
 }
 
+.custom-cursor.visible {
+  opacity: 1;
+}
+
 .custom-cursor.hovering {
-  transform: translate(-50%, -50%) scale(2);
-  background: rgba(212, 175, 55, 0.3);
+  background: rgba(212, 175, 55, 0.8);
   border: 2px solid #d4af37;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+}
+
+/* Ocultar cursor por defecto en elementos interactivos */
+button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-button {
+  cursor: none !important;
+}
+
+/* Para usuarios que prefieren cursor normal */
+@media (hover: none) {
+  .custom-cursor {
+    display: none;
+  }
+  
+  button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-button {
+    cursor: pointer !important;
+  }
 }
 
 /* Loading Screen */

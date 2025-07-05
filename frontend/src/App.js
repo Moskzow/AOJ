@@ -279,9 +279,15 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
   // Inicializar editConfig cuando se abre el panel o cambia siteConfig
   useEffect(() => {
     if (siteConfig && isOpen) {
+      console.log('Inicializando editConfig con:', siteConfig);
       setEditConfig({...siteConfig});
     }
   }, [siteConfig, isOpen]);
+
+  // Debug: Log editConfig changes
+  useEffect(() => {
+    console.log('editConfig actualizado:', editConfig);
+  }, [editConfig]);
 
   const handleImageUpload = (e, callback) => {
     const file = e.target.files[0];

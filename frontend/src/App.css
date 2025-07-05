@@ -1487,14 +1487,6 @@ button, a, .clickable, .collection-card-elegant, .jewelry-card-elegant, .cta-but
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  
-  .custom-cursor {
-    display: none;
-  }
-  
-  body {
-    cursor: auto;
-  }
 }
 
 /* Focus styles */

@@ -34,7 +34,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
-  cursor: none; /* Hide default cursor for custom cursor */
+  /* Cursor normal restaurado */
 }
 
 /* Custom Cursor Mejorado */

@@ -1144,6 +1144,7 @@ const JewelryApp = () => {
   const [isTimerActive, setIsTimerActive] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [randomButtonPosition, setRandomButtonPosition] = useState('right'); // 'left' or 'right'
+  const [selectedJewelryImage, setSelectedJewelryImage] = useState(null); // Para modal de imagen ampliada
   const { isAuthenticated, logout } = useAuth();
 
   // Color schemes

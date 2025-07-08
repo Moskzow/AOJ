@@ -1568,11 +1568,20 @@ const JewelryApp = () => {
                       src={item.image_base64}
                       alt={item.name}
                       className="jewelry-image"
+                      onClick={() => setSelectedJewelryImage({
+                        src: item.image_base64,
+                        name: item.name,
+                        description: item.description
+                      })}
+                      style={{ cursor: 'pointer' }}
                     />
                     <div className="jewelry-shine-effect"></div>
                     {isAuthenticated && (
                       <button
-                        onClick={() => openImageEditor(item.image_base64, item.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openImageEditor(item.image_base64, item.id);
+                        }}
                         className="edit-image-btn-small"
                       >
                         Editar

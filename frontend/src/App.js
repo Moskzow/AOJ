@@ -1669,6 +1669,34 @@ const JewelryApp = () => {
         />
       )}
 
+      {/* Modal de imagen ampliada */}
+      {selectedJewelryImage && (
+        <div 
+          className="modal-backdrop image-modal-backdrop"
+          onClick={() => setSelectedJewelryImage(null)}
+        >
+          <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setSelectedJewelryImage(null)}
+              className="close-btn-image-modal"
+            >
+              ×
+            </button>
+            <div className="image-modal-wrapper">
+              <img
+                src={selectedJewelryImage.src}
+                alt={selectedJewelryImage.name}
+                className="image-modal-img"
+              />
+              <div className="image-modal-info">
+                <h3 className="image-modal-title">{selectedJewelryImage.name}</h3>
+                <p className="image-modal-description">{selectedJewelryImage.description}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Admin Access Button - SOLO DESPUÉS DE AUTENTICACIÓN */}
       {isAuthenticated && (
         <div className="admin-float-button">

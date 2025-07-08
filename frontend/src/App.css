@@ -560,8 +560,47 @@ body {
 .jewelry-showcase {
   padding: 2rem 3rem 3rem;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
+}
+
+/* Grid adaptativo según número de elementos */
+.jewelry-showcase:has(.jewelry-card-elegant:nth-child(1):last-child) {
+  /* Solo 1 elemento */
+  grid-template-columns: 1fr;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.jewelry-showcase:has(.jewelry-card-elegant:nth-child(2):last-child) {
+  /* 2 elementos */
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.jewelry-showcase:has(.jewelry-card-elegant:nth-child(3):last-child) {
+  /* 3 elementos */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.jewelry-showcase:has(.jewelry-card-elegant:nth-child(4)) {
+  /* 4 o más elementos */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+@media (max-width: 768px) {
+  .collections-showcase {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .jewelry-showcase {
+    grid-template-columns: 1fr !important;
+    padding: 1.5rem;
+    max-width: none !important;
+  }
 }
 
 .jewelry-card-elegant {

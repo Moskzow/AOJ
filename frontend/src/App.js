@@ -1489,7 +1489,11 @@ const JewelryApp = () => {
   const saveEditedImage = (imageBase64, filters) => {
     // La imagen ya se guarda en el backend desde el ImageEditor
     // Aquí solo actualizamos la UI local
-    if (editingImage?.itemId) {
+    if (editingImage?.itemId === 'logo') {
+      // Actualizar logo en la configuración
+      setSiteConfig(prev => ({ ...prev, logo_base64: imageBase64 }));
+      loadSiteConfig(); // Recargar configuración desde el backend
+    } else if (editingImage?.itemId) {
       loadJewelryItems();
     } else if (editingImage?.collectionId) {
       loadCollections();

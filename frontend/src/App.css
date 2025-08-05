@@ -99,29 +99,29 @@ body {
   padding: 0 2rem;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Cambio de center a space-between */
+  justify-content: center; /* Volver a centrar */
   gap: 2rem;
 }
 
 .logo-container {
   overflow: hidden;
-  order: 1; /* Posicionar a la izquierda */
+  order: 0; /* Posición normal en el centro */
 }
 
 .logo {
-  height: clamp(40px, 8vw, 60px); /* Tamaño mínimo 40px, máximo 60px */
+  height: 60px; /* Tamaño fijo que no cambia */
   object-fit: contain;
   transition: var(--transition-smooth);
 }
 
 .main-header.scrolled .logo {
-  height: clamp(30px, 6vw, 45px); /* Tamaño mínimo 30px, máximo 45px cuando scrolled */
+  height: 60px; /* Mantener el mismo tamaño al hacer scroll */
 }
 
 .site-title {
-  text-align: left; /* Cambio de center a left */
-  order: 2; /* Posicionar después del logo */
-  flex: 1; /* Ocupar el espacio restante */
+  text-align: center; /* Mantener centrado */
+  order: 1; /* Posición normal */
+  flex: 0; /* No ocupar espacio extra */
 }
 
 .site-name {

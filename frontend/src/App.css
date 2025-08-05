@@ -106,6 +106,32 @@ body {
 .logo-container {
   overflow: hidden;
   order: 0; /* Posición normal en el centro */
+  position: relative;
+}
+
+.edit-logo-btn {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: rgba(0, 123, 255, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.logo-container:hover .edit-logo-btn {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .logo {

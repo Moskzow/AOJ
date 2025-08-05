@@ -716,6 +716,8 @@ body {
   height: 320px; /* Altura fija para uniformidad */
   display: flex;
   flex-direction: column;
+  max-width: 300px; /* Ancho máximo para evitar que se estiren demasiado */
+  margin: 0 auto; /* Centrar las tarjetas cuando hay pocas */
 }
 
 .jewelry-card-elegant:hover {

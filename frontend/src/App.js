@@ -141,7 +141,14 @@ const ImageEditor = ({ imageBase64, onSave, onClose, itemId, collectionId }) => 
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
   const [saturation, setSaturation] = useState(100);
+  const [cropType, setCropType] = useState('square'); // square, vertical, horizontal
   const [isSaving, setIsSaving] = useState(false);
+
+  const cropAspectRatios = {
+    square: 1,
+    vertical: 3/4,
+    horizontal: 4/3
+  };
 
   const applyFilters = () => {
     return {
@@ -149,34 +156,60 @@ const ImageEditor = ({ imageBase64, onSave, onClose, itemId, collectionId }) => 
     };
   };
 
+  const applyCropAndFilters = (img, cropType) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const aspectRatio = cropAspectRatios[cropType];
+    
+    let cropWidth, cropHeight, cropX, cropY;
+
+    if (aspectRatio === 1) {
+      // Square crop
+      const size = Math.min(img.width, img.height);
+      cropWidth = cropHeight = size;
+      cropX = (img.width - size) / 2;
+      cropY = (img.height - size) / 2;
+    } else if (aspectRatio < 1) {
+      // Vertical rectangle
+      cropHeight = img.height;
+      cropWidth = cropHeight * aspectRatio;
+      cropX = (img.width - cropWidth) / 2;
+      cropY = 0;
+    } else {
+      // Horizontal rectangle
+      cropWidth = img.width;
+      cropHeight = cropWidth / aspectRatio;
+      cropX = 0;
+      cropY = (img.height - cropHeight) / 2;
+    }
+
+    canvas.width = cropWidth;
+    canvas.height = cropHeight;
+    
+    // Apply filters and crop
+    ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+    ctx.drawImage(img, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+    
+    return canvas.toDataURL('image/jpeg', 0.9);
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Crear canvas para aplicar los filtros a la imagen
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
       const img = new Image();
       
       img.onload = async () => {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        
-        // Aplicar filtros
-        ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-        ctx.drawImage(img, 0, 0);
-        
-        // Convertir a base64
-        const filteredImageBase64 = canvas.toDataURL('image/jpeg', 0.9);
+        const croppedAndFilteredImage = applyCropAndFilters(img, cropType);
         
         // Guardar en el backend
         await axios.post(`${API}/save-edited-image`, {
           item_id: itemId,
           collection_id: collectionId,
-          image_base64: filteredImageBase64
+          image_base64: croppedAndFilteredImage
         });
         
         // Callback para actualizar la UI
-        onSave(filteredImageBase64, { brightness, contrast, saturation });
+        onSave(croppedAndFilteredImage, { brightness, contrast, saturation, cropType });
         
         alert('Imagen guardada exitosamente');
         onClose();
@@ -192,60 +225,106 @@ const ImageEditor = ({ imageBase64, onSave, onClose, itemId, collectionId }) => 
   };
 
   return (
-    <div className="modal-backdrop">
+    <div className="modal-backdrop image-editor-backdrop">
       <div className="modal-content image-editor-modal">
-        <h2 className="modal-title">Editor de Imagen</h2>
+        <div className="editor-header">
+          <h2 className="editor-title">Editor de Imagen</h2>
+          <button onClick={onClose} className="close-btn-editor">×</button>
+        </div>
         
         <div className="image-editor-content">
           <div className="image-preview-section">
-            <img
-              src={editedImage}
-              alt="Preview"
-              style={applyFilters()}
-              className="image-preview-large"
-            />
+            <div className={`image-preview-container crop-${cropType}`}>
+              <img
+                src={editedImage}
+                alt="Preview"
+                style={applyFilters()}
+                className="image-preview-large"
+              />
+              <div className="crop-overlay"></div>
+            </div>
           </div>
           
           <div className="controls-section">
-            <div className="control-group">
-              <label className="control-label">Brillo: {brightness}%</label>
-              <input
-                type="range"
-                min="50"
-                max="150"
-                value={brightness}
-                onChange={(e) => setBrightness(e.target.value)}
-                className="range-slider"
-              />
+            <div className="control-section">
+              <h4 className="control-title">Formato de Recorte (Obligatorio)</h4>
+              <div className="crop-buttons">
+                <button
+                  className={`btn-crop ${cropType === 'square' ? 'active' : ''}`}
+                  onClick={() => setCropType('square')}
+                >
+                  📐 Cuadrado (1:1)
+                </button>
+                <button
+                  className={`btn-crop ${cropType === 'vertical' ? 'active' : ''}`}
+                  onClick={() => setCropType('vertical')}
+                >
+                  📱 Vertical (3:4)
+                </button>
+                <button
+                  className={`btn-crop ${cropType === 'horizontal' ? 'active' : ''}`}
+                  onClick={() => setCropType('horizontal')}
+                >
+                  🖥️ Horizontal (4:3)
+                </button>
+              </div>
             </div>
-            
-            <div className="control-group">
-              <label className="control-label">Contraste: {contrast}%</label>
-              <input
-                type="range"
-                min="50"
-                max="150"
-                value={contrast}
-                onChange={(e) => setContrast(e.target.value)}
-                className="range-slider"
-              />
-            </div>
-            
-            <div className="control-group">
-              <label className="control-label">Saturación: {saturation}%</label>
-              <input
-                type="range"
-                min="0"
-                max="200"
-                value={saturation}
-                onChange={(e) => setSaturation(e.target.value)}
-                className="range-slider"
-              />
+
+            <div className="control-section">
+              <h4 className="control-title">Ajustes de Color</h4>
+              
+              <div className="control-group">
+                <label className="control-label">Brillo: {brightness}%</label>
+                <input
+                  type="range"
+                  min="50"
+                  max="150"
+                  value={brightness}
+                  onChange={(e) => setBrightness(e.target.value)}
+                  className="range-slider"
+                />
+              </div>
+              
+              <div className="control-group">
+                <label className="control-label">Contraste: {contrast}%</label>
+                <input
+                  type="range"
+                  min="50"
+                  max="150"
+                  value={contrast}
+                  onChange={(e) => setContrast(e.target.value)}
+                  className="range-slider"
+                />
+              </div>
+              
+              <div className="control-group">
+                <label className="control-label">Saturación: {saturation}%</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="200"
+                  value={saturation}
+                  onChange={(e) => setSaturation(e.target.value)}
+                  className="range-slider"
+                />
+              </div>
             </div>
           </div>
         </div>
         
-        <div className="form-actions">
+        <div className="editor-actions">
+          <button
+            onClick={() => {
+              setBrightness(100);
+              setContrast(100);
+              setSaturation(100);
+              setCropType('square');
+            }}
+            className="btn-secondary"
+            disabled={isSaving}
+          >
+            Restablecer
+          </button>
           <button
             onClick={handleSave}
             className={`btn-primary ${isSaving ? 'loading' : ''}`}

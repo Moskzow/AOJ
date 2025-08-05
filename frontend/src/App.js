@@ -432,7 +432,11 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
     
     try {
       console.log('Guardando configuración:', editConfig);
-      const response = await axios.put(`${API}/config`, editConfig);
+      // Obtener el token del localStorage
+      const token = localStorage.getItem('token');
+      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+      
+      const response = await axios.put(`${API}/config`, editConfig, { headers });
       console.log('Respuesta del servidor:', response.data);
       
       // Recargar la configuración desde el servidor

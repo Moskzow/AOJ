@@ -1521,8 +1521,18 @@ const JewelryApp = () => {
                 src={siteConfig.logo_base64}
                 alt={siteConfig.site_name}
                 className="logo"
-                style={{ transform: `scale(${1 - scrollY * 0.0005})` }}
+                onClick={() => isAuthenticated && openImageEditor(siteConfig.logo_base64, 'logo')}
+                style={{ cursor: isAuthenticated ? 'pointer' : 'default' }}
               />
+              {isAuthenticated && (
+                <button
+                  onClick={() => openImageEditor(siteConfig.logo_base64, 'logo')}
+                  className="edit-logo-btn"
+                  title="Editar logo"
+                >
+                  ✏️
+                </button>
+              )}
             </div>
           )}
           <div className="site-title">

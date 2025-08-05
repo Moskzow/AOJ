@@ -201,12 +201,23 @@ const ImageEditor = ({ imageBase64, onSave, onClose, itemId, collectionId }) => 
       img.onload = async () => {
         const croppedAndFilteredImage = applyCropAndFilters(img, cropType);
         
-        // Guardar en el backend
-        await axios.post(`${API}/save-edited-image`, {
-          item_id: itemId,
-          collection_id: collectionId,
-          image_base64: croppedAndFilteredImage
-        });
+        // Obtener el token del localStorage
+        const token = localStorage.getItem('token');
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+        
+        if (itemId === 'logo') {
+          // Guardar logo en la configuración del sitio
+          await axios.put(`${API}/config`, { 
+            logo_base64: croppedAndFilteredImage 
+          }, { headers });
+        } else {
+          // Guardar imagen de joya/colección
+          await axios.post(`${API}/save-edited-image`, {
+            item_id: itemId,
+            collection_id: collectionId,
+            image_base64: croppedAndFilteredImage
+          }, { headers });
+        }
         
         // Callback para actualizar la UI
         onSave(croppedAndFilteredImage, { brightness, contrast, saturation, cropType });
@@ -218,7 +229,7 @@ const ImageEditor = ({ imageBase64, onSave, onClose, itemId, collectionId }) => 
       img.src = editedImage;
     } catch (error) {
       console.error('Error saving image:', error);
-      alert('Error al guardar la imagen');
+      alert(`Error al guardar la imagen: ${error.response?.data?.detail || error.message}`);
     } finally {
       setIsSaving(false);
     }

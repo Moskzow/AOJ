@@ -1735,6 +1735,10 @@ const JewelryApp = () => {
       // Actualizar logo en la configuración
       setSiteConfig(prev => ({ ...prev, logo_base64: imageBase64 }));
       loadSiteConfig(); // Recargar configuración desde el backend
+    } else if (editingImage?.itemId === 'hero') {
+      // Actualizar imagen del hero en la configuración
+      setSiteConfig(prev => ({ ...prev, hero_image_base64: imageBase64 }));
+      loadSiteConfig(); // Recargar configuración desde el backend
     } else if (editingImage?.itemId) {
       loadJewelryItems();
     } else if (editingImage?.collectionId) {

@@ -1221,8 +1221,9 @@ body {
   .editor-actions button {
     width: 100%;
   }
+}
 
-
+/* Panel Header Styles (legacy editor styles follow) */
 .editor-header {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   padding: 1.5rem 2rem;

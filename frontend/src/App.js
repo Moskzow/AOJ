@@ -1303,6 +1303,17 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
           )}
         </div>
       </div>
+      
+      {/* Editor de Imágenes dedicado para AdminPanel */}
+      {showAdminImageEditor && (
+        <ImageEditor
+          imageBase64={adminEditingImage?.base64}
+          onSave={saveEditedImage}
+          onClose={() => {setShowAdminImageEditor(false); setAdminEditingImage(null);}}
+          itemId={adminEditingImage?.itemId}
+          collectionId={adminEditingImage?.collectionId}
+        />
+      )}
     </div>
   );
 };

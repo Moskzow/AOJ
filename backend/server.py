@@ -151,6 +151,7 @@ class SiteConfigUpdate(BaseModel):
     
     # Configuración visual
     logo_base64: Optional[str] = None
+    hero_image_base64: Optional[str] = None  # Nueva imagen de fondo para Hero
     color_scheme: Optional[str] = None
     
     # Configuración admin

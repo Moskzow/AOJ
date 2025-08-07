@@ -522,7 +522,7 @@ const ImageEditor = ({ imageBase64, onSave, onClose, itemId, collectionId }) => 
 };
 
 // Panel de Administración Completo y Expandido
-const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, onCollectionsUpdate, jewelryItems, onJewelryUpdate, openImageEditor }) => {
+const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, onCollectionsUpdate, jewelryItems, onJewelryUpdate }) => {
   const [activeTab, setActiveTab] = useState('general');
   const [editConfig, setEditConfig] = useState({});
   const [editingCollection, setEditingCollection] = useState(null);

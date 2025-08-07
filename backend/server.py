@@ -358,7 +358,16 @@ async def save_edited_image(
         if not edited_image_base64:
             raise HTTPException(status_code=400, detail="No image data provided")
         
-        if item_id:
+        if item_id == 'hero':
+            # Update hero background image in site config
+            result = await db.site_config.update_one(
+                {},
+                {"$set": {"hero_image_base64": edited_image_base64}},
+                upsert=True
+            )
+            return {"message": "Hero background image updated successfully"}
+            
+        elif item_id:
             # Update jewelry item image
             result = await db.jewelry_items.update_one(
                 {"id": item_id},

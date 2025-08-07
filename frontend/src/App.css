@@ -867,7 +867,7 @@ body {
   text-overflow: ellipsis;
 }
 
-/* Image Editor Modal Styles con Glassmorphism */
+/* Image Editor Modal Styles con Glassmorphism Avanzado */
 .image-editor-backdrop {
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
@@ -875,9 +875,9 @@ body {
 }
 
 .image-editor-modal {
-  max-width: 1000px;
+  max-width: 1200px;
   width: 95%;
-  max-height: 90vh;
+  max-height: 95vh;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
@@ -889,6 +889,339 @@ body {
     0 8px 32px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   animation: slideInUp 0.4s ease-out;
+}
+
+.editor-header {
+  background: linear-gradient(135deg, 
+    rgba(212, 175, 55, 0.1) 0%, 
+    rgba(244, 228, 166, 0.1) 100%);
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.editor-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.close-btn-editor {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn-editor:hover {
+  background: #dc2626;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Editor Tabs */
+.editor-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 1.5rem;
+  gap: 4px;
+}
+
+.editor-tab {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #666;
+}
+
+.editor-tab.active {
+  background: rgba(212, 175, 55, 0.9);
+  color: white;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.editor-tab:hover:not(.active) {
+  background: rgba(212, 175, 55, 0.1);
+  color: #b8941f;
+}
+
+/* Enhanced Controls */
+.control-group {
+  margin-bottom: 1.5rem;
+}
+
+.control-label {
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  display: block;
+  font-size: 0.9rem;
+}
+
+.range-slider {
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, #e5e7eb 0%, #d1d5db 100%);
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+  margin-bottom: 4px;
+}
+
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #d4af37, #f4e4a6);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+  transition: all 0.3s ease;
+}
+
+.range-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.5);
+}
+
+.range-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #d4af37, #f4e4a6);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+}
+
+/* Hue Slider Special Styling */
+.hue-slider {
+  background: linear-gradient(90deg, 
+    hsl(0, 100%, 50%) 0%,
+    hsl(60, 100%, 50%) 16.66%,
+    hsl(120, 100%, 50%) 33.33%,
+    hsl(180, 100%, 50%) 50%,
+    hsl(240, 100%, 50%) 66.66%,
+    hsl(300, 100%, 50%) 83.33%,
+    hsl(360, 100%, 50%) 100%
+  );
+}
+
+/* Temperature Slider Special Styling */
+.temperature-slider {
+  background: linear-gradient(90deg, 
+    #ff6b35 0%, 
+    #f7931e 25%, 
+    #ffffff 50%, 
+    #74b9ff 75%, 
+    #0984e3 100%
+  );
+}
+
+/* Temperature Presets */
+.temperature-presets {
+  display: flex;
+  gap: 8px;
+  margin-top: 1rem;
+}
+
+.preset-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.preset-btn.warm {
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  color: white;
+}
+
+.preset-btn.neutral {
+  background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+  color: #374151;
+}
+
+.preset-btn.cool {
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+  color: white;
+}
+
+.preset-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Crop Buttons Enhanced */
+.crop-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 1rem;
+}
+
+.btn-crop {
+  padding: 12px 16px;
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  color: #1a1a1a;
+}
+
+.btn-crop:hover {
+  border-color: rgba(212, 175, 55, 0.6);
+  background: rgba(212, 175, 55, 0.1);
+  transform: translateY(-2px);
+}
+
+.btn-crop.active {
+  border-color: #d4af37;
+  background: linear-gradient(135deg, #d4af37, #f4e4a6);
+  color: white;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+/* Enhanced Image Preview */
+.image-preview-container {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.image-preview-large {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.crop-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+/* Crop type specific overlays */
+.crop-square .crop-overlay {
+  border: 2px dashed rgba(212, 175, 55, 0.8);
+}
+
+.crop-vertical .crop-overlay {
+  border: 2px dashed rgba(67, 160, 71, 0.8);
+}
+
+.crop-horizontal .crop-overlay {
+  border: 2px dashed rgba(33, 150, 243, 0.8);
+}
+
+.crop-free .crop-overlay {
+  border: 2px dashed rgba(156, 39, 176, 0.8);
+}
+
+/* Editor Actions Enhanced */
+.editor-actions {
+  padding: 1.5rem 2rem;
+  background: rgba(255, 255, 255, 0.3);
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.editor-actions .btn-primary {
+  background: linear-gradient(135deg, #d4af37, #f4e4a6);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.editor-actions .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+}
+
+.editor-actions .btn-secondary {
+  background: rgba(156, 163, 175, 0.2);
+  color: #374151;
+  border: 1px solid rgba(156, 163, 175, 0.3);
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.editor-actions .btn-secondary:hover {
+  background: rgba(156, 163, 175, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Responsive Design for Editor */
+@media (max-width: 768px) {
+  .image-editor-content {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .crop-buttons {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .temperature-presets {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .editor-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .editor-actions button {
+    width: 100%;
+  }
+}
   overflow: hidden;
   display: flex;
   flex-direction: column;

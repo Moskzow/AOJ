@@ -1580,6 +1580,8 @@ const JewelryApp = () => {
         </div>
       </section>
 
+      {/* Contenido que se superpone con efecto parallax */}
+      <div className="content-overlay">
       {/* Collections Section con efectos avanzados */}
       <section id="collections" className="collections-section">
         <div className="section-container">

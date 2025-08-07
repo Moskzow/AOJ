@@ -2076,16 +2076,6 @@ const JewelryApp = () => {
         </div>
       )}
       
-      {/* Editor de Imágenes integrado en AdminPanel */}
-      {showImageEditor && (
-        <ImageEditor
-          imageBase64={editingImage?.imageBase64}
-          onSave={saveEditedImage}
-          onClose={() => {setShowImageEditor(false); setEditingImage(null);}}
-          itemId={editingImage?.itemId}
-          collectionId={editingImage?.collectionId}
-        />
-      )}
     </div>
   );
 };

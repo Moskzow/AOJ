@@ -135,60 +135,116 @@ const LoginModal = ({ isOpen, onClose }) => {
   );
 };
 
-// Componente Editor de Imágenes FUNCIONAL
+// Componente Editor de Imágenes AVANZADO con Glassmorphism
 const ImageEditor = ({ imageBase64, onSave, onClose, itemId, collectionId }) => {
   const [editedImage, setEditedImage] = useState(imageBase64);
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
   const [saturation, setSaturation] = useState(100);
-  const [cropType, setCropType] = useState('square'); // square, vertical, horizontal
+  const [hue, setHue] = useState(0); // Nuevo: tono de color
+  const [whiteBalance, setWhiteBalance] = useState(6500); // Nuevo: balance de blancos (temperatura)
+  const [cropType, setCropType] = useState('square'); // square, vertical, horizontal, free
   const [isSaving, setIsSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState('crop'); // crop, colors, effects
 
   const cropAspectRatios = {
     square: 1,
     vertical: 3/4,
-    horizontal: 4/3
+    horizontal: 4/3,
+    free: null // Para recorte libre
   };
 
   const applyFilters = () => {
+    // Calcular temperatura de color basada en balance de blancos
+    let tempRed = 1, tempGreen = 1, tempBlue = 1;
+    
+    if (whiteBalance < 6500) {
+      // Temperatura cálida (más roja)
+      const factor = (6500 - whiteBalance) / 2000;
+      tempRed = 1 + factor * 0.3;
+      tempBlue = Math.max(0.7, 1 - factor * 0.2);
+    } else if (whiteBalance > 6500) {
+      // Temperatura fría (más azul)
+      const factor = (whiteBalance - 6500) / 2000;
+      tempBlue = 1 + factor * 0.3;
+      tempRed = Math.max(0.8, 1 - factor * 0.1);
+    }
+
     return {
-      filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`
+      filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) hue-rotate(${hue}deg)`,
+      // Aplicar balance de blancos usando CSS mix-blend-mode simulado con overlays
+      position: 'relative'
     };
+  };
+
+  const getTemperatureOverlay = () => {
+    if (whiteBalance === 6500) return null;
+    
+    let overlayColor, opacity;
+    if (whiteBalance < 6500) {
+      // Cálido - overlay naranja/rojo
+      const intensity = (6500 - whiteBalance) / 2000;
+      overlayColor = `rgba(255, 147, 41, ${intensity * 0.15})`;
+    } else {
+      // Frío - overlay azul
+      const intensity = (whiteBalance - 6500) / 2000;
+      overlayColor = `rgba(41, 147, 255, ${intensity * 0.15})`;
+    }
+    
+    return overlayColor;
   };
 
   const applyCropAndFilters = (img, cropType) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    const aspectRatio = cropAspectRatios[cropType];
     
     let cropWidth, cropHeight, cropX, cropY;
 
-    if (aspectRatio === 1) {
-      // Square crop
-      const size = Math.min(img.width, img.height);
-      cropWidth = cropHeight = size;
-      cropX = (img.width - size) / 2;
-      cropY = (img.height - size) / 2;
-    } else if (aspectRatio < 1) {
-      // Vertical rectangle
-      cropHeight = img.height;
-      cropWidth = cropHeight * aspectRatio;
-      cropX = (img.width - cropWidth) / 2;
-      cropY = 0;
-    } else {
-      // Horizontal rectangle
+    if (cropType === 'free') {
+      // Para recorte libre, usar toda la imagen
       cropWidth = img.width;
-      cropHeight = cropWidth / aspectRatio;
-      cropX = 0;
-      cropY = (img.height - cropHeight) / 2;
+      cropHeight = img.height;
+      cropX = cropY = 0;
+    } else {
+      const aspectRatio = cropAspectRatios[cropType];
+      
+      if (aspectRatio === 1) {
+        // Square crop
+        const size = Math.min(img.width, img.height);
+        cropWidth = cropHeight = size;
+        cropX = (img.width - size) / 2;
+        cropY = (img.height - size) / 2;
+      } else if (aspectRatio < 1) {
+        // Vertical rectangle
+        cropHeight = img.height;
+        cropWidth = cropHeight * aspectRatio;
+        cropX = (img.width - cropWidth) / 2;
+        cropY = 0;
+      } else {
+        // Horizontal rectangle
+        cropWidth = img.width;
+        cropHeight = cropWidth / aspectRatio;
+        cropX = 0;
+        cropY = (img.height - cropHeight) / 2;
+      }
     }
 
     canvas.width = cropWidth;
     canvas.height = cropHeight;
     
-    // Apply filters and crop
-    ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+    // Apply filters
+    ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) hue-rotate(${hue}deg)`;
+    
+    // Draw the cropped image
     ctx.drawImage(img, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+    
+    // Apply white balance overlay if needed
+    const overlayColor = getTemperatureOverlay();
+    if (overlayColor) {
+      ctx.globalCompositeOperation = 'overlay';
+      ctx.fillStyle = overlayColor;
+      ctx.fillRect(0, 0, cropWidth, cropHeight);
+    }
     
     return canvas.toDataURL('image/jpeg', 0.9);
   };
@@ -199,28 +255,24 @@ const ImageEditor = ({ imageBase64, onSave, onClose, itemId, collectionId }) => 
       const img = new Image();
       
       img.onload = async () => {
-        const croppedAndFilteredImage = applyCropAndFilters(img, cropType);
+        const processedImage = applyCropAndFilters(img, cropType);
         
-        // Obtener el token del localStorage
         const token = localStorage.getItem('token');
         const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
         
         if (itemId === 'logo') {
-          // Guardar logo en la configuración del sitio
           await axios.put(`${API}/config`, { 
-            logo_base64: croppedAndFilteredImage 
+            logo_base64: processedImage 
           }, { headers });
         } else {
-          // Guardar imagen de joya/colección
           await axios.post(`${API}/save-edited-image`, {
             item_id: itemId,
             collection_id: collectionId,
-            image_base64: croppedAndFilteredImage
+            image_base64: processedImage
           }, { headers });
         }
         
-        // Callback para actualizar la UI
-        onSave(croppedAndFilteredImage, { brightness, contrast, saturation, cropType });
+        onSave(processedImage, { brightness, contrast, saturation, hue, whiteBalance, cropType });
         
         alert('Imagen guardada exitosamente');
         onClose();
@@ -235,120 +287,233 @@ const ImageEditor = ({ imageBase64, onSave, onClose, itemId, collectionId }) => 
     }
   };
 
+  const resetFilters = () => {
+    setBrightness(100);
+    setContrast(100);
+    setSaturation(100);
+    setHue(0);
+    setWhiteBalance(6500);
+    setCropType('square');
+  };
+
   return (
     <div className="modal-backdrop image-editor-backdrop">
       <div className="modal-content image-editor-modal">
         <div className="editor-header">
-          <h2 className="editor-title">Editor de Imagen</h2>
+          <h2 className="editor-title">🎨 Editor de Imagen Avanzado</h2>
           <button onClick={onClose} className="close-btn-editor">×</button>
         </div>
         
         <div className="image-editor-content">
+          {/* Preview Section */}
           <div className="image-preview-section">
             <div className={`image-preview-container crop-${cropType}`}>
-              <img
-                src={editedImage}
-                alt="Preview"
-                style={applyFilters()}
-                className="image-preview-large"
-              />
+              <div style={{ position: 'relative' }}>
+                <img
+                  src={editedImage}
+                  alt="Preview"
+                  style={applyFilters()}
+                  className="image-preview-large"
+                />
+                {getTemperatureOverlay() && (
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: getTemperatureOverlay(),
+                      pointerEvents: 'none',
+                      borderRadius: '8px'
+                    }}
+                  />
+                )}
+              </div>
               <div className="crop-overlay"></div>
             </div>
           </div>
           
+          {/* Controls Section */}
           <div className="controls-section">
-            <div className="control-section">
-              <h4 className="control-title">Formato de Recorte (Obligatorio)</h4>
-              <div className="crop-buttons">
-                <button
-                  className={`btn-crop ${cropType === 'square' ? 'active' : ''}`}
-                  onClick={() => setCropType('square')}
-                >
-                  📐 Cuadrado (1:1)
-                </button>
-                <button
-                  className={`btn-crop ${cropType === 'vertical' ? 'active' : ''}`}
-                  onClick={() => setCropType('vertical')}
-                >
-                  📱 Vertical (3:4)
-                </button>
-                <button
-                  className={`btn-crop ${cropType === 'horizontal' ? 'active' : ''}`}
-                  onClick={() => setCropType('horizontal')}
-                >
-                  🖥️ Horizontal (4:3)
-                </button>
-              </div>
+            {/* Tabs Navigation */}
+            <div className="editor-tabs">
+              <button
+                className={`editor-tab ${activeTab === 'crop' ? 'active' : ''}`}
+                onClick={() => setActiveTab('crop')}
+              >
+                ✂️ Recorte
+              </button>
+              <button
+                className={`editor-tab ${activeTab === 'colors' ? 'active' : ''}`}
+                onClick={() => setActiveTab('colors')}
+              >
+                🎨 Colores
+              </button>
+              <button
+                className={`editor-tab ${activeTab === 'effects' ? 'active' : ''}`}
+                onClick={() => setActiveTab('effects')}
+              >
+                ✨ Efectos
+              </button>
             </div>
 
-            <div className="control-section">
-              <h4 className="control-title">Ajustes de Color</h4>
-              
-              <div className="control-group">
-                <label className="control-label">Brillo: {brightness}%</label>
-                <input
-                  type="range"
-                  min="50"
-                  max="150"
-                  value={brightness}
-                  onChange={(e) => setBrightness(e.target.value)}
-                  className="range-slider"
-                />
+            {/* Crop Controls */}
+            {activeTab === 'crop' && (
+              <div className="control-section">
+                <h4 className="control-title">Formato de Recorte</h4>
+                <div className="crop-buttons">
+                  <button
+                    className={`btn-crop ${cropType === 'square' ? 'active' : ''}`}
+                    onClick={() => setCropType('square')}
+                  >
+                    📐 Cuadrado (1:1)
+                  </button>
+                  <button
+                    className={`btn-crop ${cropType === 'vertical' ? 'active' : ''}`}
+                    onClick={() => setCropType('vertical')}
+                  >
+                    📱 Vertical (3:4)
+                  </button>
+                  <button
+                    className={`btn-crop ${cropType === 'horizontal' ? 'active' : ''}`}
+                    onClick={() => setCropType('horizontal')}
+                  >
+                    🖥️ Horizontal (4:3)
+                  </button>
+                  <button
+                    className={`btn-crop ${cropType === 'free' ? 'active' : ''}`}
+                    onClick={() => setCropType('free')}
+                  >
+                    🔓 Libre
+                  </button>
+                </div>
               </div>
-              
-              <div className="control-group">
-                <label className="control-label">Contraste: {contrast}%</label>
-                <input
-                  type="range"
-                  min="50"
-                  max="150"
-                  value={contrast}
-                  onChange={(e) => setContrast(e.target.value)}
-                  className="range-slider"
-                />
+            )}
+
+            {/* Color Controls */}
+            {activeTab === 'colors' && (
+              <div className="control-section">
+                <h4 className="control-title">Ajustes de Color</h4>
+                
+                <div className="control-group">
+                  <label className="control-label">💡 Brillo: {brightness}%</label>
+                  <input
+                    type="range"
+                    min="50"
+                    max="150"
+                    value={brightness}
+                    onChange={(e) => setBrightness(e.target.value)}
+                    className="range-slider"
+                  />
+                </div>
+                
+                <div className="control-group">
+                  <label className="control-label">⚡ Contraste: {contrast}%</label>
+                  <input
+                    type="range"
+                    min="50"
+                    max="150"
+                    value={contrast}
+                    onChange={(e) => setContrast(e.target.value)}
+                    className="range-slider"
+                  />
+                </div>
+                
+                <div className="control-group">
+                  <label className="control-label">🌈 Saturación: {saturation}%</label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="200"
+                    value={saturation}
+                    onChange={(e) => setSaturation(e.target.value)}
+                    className="range-slider"
+                  />
+                </div>
+
+                <div className="control-group">
+                  <label className="control-label">🎨 Tono: {hue}°</label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="360"
+                    value={hue}
+                    onChange={(e) => setHue(e.target.value)}
+                    className="range-slider hue-slider"
+                  />
+                </div>
               </div>
-              
-              <div className="control-group">
-                <label className="control-label">Saturación: {saturation}%</label>
-                <input
-                  type="range"
-                  min="0"
-                  max="200"
-                  value={saturation}
-                  onChange={(e) => setSaturation(e.target.value)}
-                  className="range-slider"
-                />
+            )}
+
+            {/* Effects Controls */}
+            {activeTab === 'effects' && (
+              <div className="control-section">
+                <h4 className="control-title">Balance de Blancos</h4>
+                
+                <div className="control-group">
+                  <label className="control-label">
+                    🌡️ Temperatura: {whiteBalance}K 
+                    {whiteBalance < 6000 ? ' (Cálido)' : 
+                     whiteBalance > 7000 ? ' (Frío)' : ' (Neutro)'}
+                  </label>
+                  <input
+                    type="range"
+                    min="3000"
+                    max="9000"
+                    step="100"
+                    value={whiteBalance}
+                    onChange={(e) => setWhiteBalance(e.target.value)}
+                    className="range-slider temperature-slider"
+                  />
+                </div>
+
+                <div className="temperature-presets">
+                  <button
+                    className="preset-btn warm"
+                    onClick={() => setWhiteBalance(3000)}
+                  >
+                    🔥 Muy Cálido
+                  </button>
+                  <button
+                    className="preset-btn neutral"
+                    onClick={() => setWhiteBalance(6500)}
+                  >
+                    ⚪ Neutro
+                  </button>
+                  <button
+                    className="preset-btn cool"
+                    onClick={() => setWhiteBalance(9000)}
+                  >
+                    ❄️ Muy Frío
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
         
         <div className="editor-actions">
           <button
-            onClick={() => {
-              setBrightness(100);
-              setContrast(100);
-              setSaturation(100);
-              setCropType('square');
-            }}
+            onClick={resetFilters}
             className="btn-secondary"
             disabled={isSaving}
           >
-            Restablecer
+            🔄 Restablecer Todo
           </button>
           <button
             onClick={handleSave}
             className={`btn-primary ${isSaving ? 'loading' : ''}`}
             disabled={isSaving}
           >
-            {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+            {isSaving ? 'Guardando...' : '💾 Guardar Cambios'}
           </button>
           <button
             onClick={onClose}
             className="btn-secondary"
             disabled={isSaving}
           >
-            Cancelar
+            ❌ Cancelar
           </button>
         </div>
       </div>

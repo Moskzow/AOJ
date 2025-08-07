@@ -189,6 +189,15 @@ body {
   z-index: 1;
 }
 
+/* Contenedor de contenido que se superpone con parallax */
+.content-overlay {
+  position: relative;
+  z-index: 2;
+  background: white;
+  margin-top: 100vh;
+  min-height: 100vh;
+}
+
 .hero-bg {
   position: absolute;
   top: 0;

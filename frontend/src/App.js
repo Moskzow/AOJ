@@ -530,6 +530,34 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
   const [newCollection, setNewCollection] = useState({ name: '', description: '', image_base64: '', position: 0 });
   const [newJewelry, setNewJewelry] = useState({ name: '', description: '', image_base64: '', collection_id: '', position: 0 });
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Estados para editor de imágenes del AdminPanel
+  const [showAdminImageEditor, setShowAdminImageEditor] = useState(false);
+  const [adminEditingImage, setAdminEditingImage] = useState(null);
+
+  // Función para abrir el editor de imágenes desde AdminPanel
+  const openImageEditor = (imageBase64, itemId, collectionId = null) => {
+    setAdminEditingImage({ base64: imageBase64, itemId, collectionId });
+    setShowAdminImageEditor(true);
+  };
+
+  // Función para guardar imagen editada desde AdminPanel
+  const saveEditedImage = (imageBase64, filters) => {
+    if (adminEditingImage?.itemId === 'logo') {
+      setEditConfig(prev => ({ ...prev, logo_base64: imageBase64 }));
+    } else if (adminEditingImage?.itemId === 'hero') {
+      setEditConfig(prev => ({ ...prev, hero_image_base64: imageBase64 }));
+    } else if (adminEditingImage?.collectionId) {
+      // Actualizar imagen de colección
+      onCollectionsUpdate();
+    } else if (adminEditingImage?.itemId) {
+      // Actualizar imagen de joya
+      onJewelryUpdate();
+    }
+    
+    setShowAdminImageEditor(false);
+    setAdminEditingImage(null);
+  };
 
   // Inicializar editConfig cuando se abre el panel o cambia siteConfig
   useEffect(() => {

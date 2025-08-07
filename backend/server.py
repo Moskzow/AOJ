@@ -102,6 +102,7 @@ class SiteConfig(BaseModel):
     
     # Configuración visual
     logo_base64: str = ""
+    hero_image_base64: str = ""  # Nueva imagen de fondo para Hero
     color_scheme: str = "gold"
     
     # Configuración admin

@@ -1732,6 +1732,7 @@ const JewelryApp = () => {
           </div>
         </div>
       </footer>
+      </div> {/* Cierre del content-overlay para parallax */}
 
       {/* Hidden Zone */}
       {renderHiddenZone()}

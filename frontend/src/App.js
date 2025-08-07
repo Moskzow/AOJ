@@ -1102,7 +1102,7 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
                       <div className="item-actions">
                         {collection.image_base64 && (
                           <button 
-                            onClick={() => openImageEditor(collection.image_base64, collection.id, 'collection')}
+                            onClick={() => openImageEditor(collection.image_base64, null, collection.id)}
                             className="btn-info btn-sm"
                             title="Editar Imagen de Colección"
                           >

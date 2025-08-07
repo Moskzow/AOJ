@@ -530,6 +530,34 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
   const [newCollection, setNewCollection] = useState({ name: '', description: '', image_base64: '', position: 0 });
   const [newJewelry, setNewJewelry] = useState({ name: '', description: '', image_base64: '', collection_id: '', position: 0 });
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Estados para editor de imágenes
+  const [showImageEditor, setShowImageEditor] = useState(false);
+  const [editingImage, setEditingImage] = useState(null);
+
+  // Función para abrir el editor de imágenes
+  const openImageEditor = (imageBase64, itemId, collectionId = null) => {
+    setEditingImage({ imageBase64, itemId, collectionId });
+    setShowImageEditor(true);
+  };
+
+  // Función para guardar imagen editada
+  const saveEditedImage = (imageBase64, filters) => {
+    if (editingImage?.itemId === 'logo') {
+      setEditConfig(prev => ({ ...prev, logo_base64: imageBase64 }));
+    } else if (editingImage?.itemId === 'hero') {
+      setEditConfig(prev => ({ ...prev, hero_image_base64: imageBase64 }));
+    } else if (editingImage?.collectionId) {
+      // Actualizar imagen de colección
+      onCollectionsUpdate();
+    } else if (editingImage?.itemId) {
+      // Actualizar imagen de joya
+      onJewelryUpdate();
+    }
+    
+    setShowImageEditor(false);
+    setEditingImage(null);
+  };
 
   // Inicializar editConfig cuando se abre el panel o cambia siteConfig
   useEffect(() => {

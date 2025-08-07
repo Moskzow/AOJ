@@ -1459,6 +1459,8 @@ const JewelryApp = () => {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [showImageEditor, setShowImageEditor] = useState(false);
   const [editingImage, setEditingImage] = useState(null);
+  const [showAdminImageEditor, setShowAdminImageEditor] = useState(false);
+  const [adminEditingImage, setAdminEditingImage] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showHiddenZone, setShowHiddenZone] = useState(false);
   const [hiddenClicks, setHiddenClicks] = useState(0);

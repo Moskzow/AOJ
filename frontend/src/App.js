@@ -1789,11 +1789,28 @@ const JewelryApp = () => {
       </header>
 
       {/* Hero Section con parallax */}
-      <section className="hero-section">
+      <section 
+        className="hero-section"
+        style={siteConfig.hero_image_base64 ? {
+          backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${siteConfig.hero_image_base64})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
+        } : {}}
+      >
         <ParallaxSection speed={0.3} className="hero-bg">
           <div className="hero-overlay"></div>
         </ParallaxSection>
         <div className="hero-content">
+          {isAuthenticated && siteConfig.hero_image_base64 && (
+            <button
+              onClick={() => openImageEditor(siteConfig.hero_image_base64, 'hero')}
+              className="edit-hero-btn"
+              title="Editar imagen del Hero"
+            >
+              🎨 Editar Fondo
+            </button>
+          )}
           <ScrollReveal direction="up" delay={300}>
             <h1 className="hero-title">{siteConfig.hero_title || siteConfig.artisan_name}</h1>
           </ScrollReveal>

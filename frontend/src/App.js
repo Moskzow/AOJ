@@ -1208,6 +1208,15 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
                         </span>
                       </div>
                       <div className="item-actions">
+                        {jewelry.image_base64 && (
+                          <button 
+                            onClick={() => openImageEditor(jewelry.image_base64, jewelry.id)}
+                            className="btn-info btn-sm"
+                            title="Editar Imagen de Joya"
+                          >
+                            🎨 Editar Imagen
+                          </button>
+                        )}
                         <button onClick={() => setEditingJewelry(jewelry)} className="btn-secondary btn-sm">
                           ✏️ Editar
                         </button>

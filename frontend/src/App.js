@@ -2024,7 +2024,6 @@ const JewelryApp = () => {
         onCollectionsUpdate={loadCollections}
         jewelryItems={jewelryItems}
         onJewelryUpdate={loadJewelryItems}
-        openImageEditor={openImageEditor}
       />
 
       {showImageEditor && (

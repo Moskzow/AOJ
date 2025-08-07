@@ -537,7 +537,7 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
 
   // Función para abrir el editor de imágenes
   const openImageEditor = (imageBase64, itemId, collectionId = null) => {
-    setEditingImage({ imageBase64, itemId, collectionId });
+    setEditingImage({ base64: imageBase64, itemId, collectionId });
     setShowImageEditor(true);
   };
 

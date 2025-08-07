@@ -174,15 +174,19 @@ body {
   transition: var(--transition-smooth);
 }
 
-/* Hero Section */
+/* Hero Section con Efecto Parallax */
 .hero-section {
   height: 100vh;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+  z-index: 1;
 }
 
 .hero-bg {

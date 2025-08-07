@@ -835,6 +835,14 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
                   {editConfig.logo_base64 && (
                     <div className="image-preview">
                       <img src={editConfig.logo_base64} alt="Logo preview" className="preview-img" />
+                      <button
+                        type="button"
+                        onClick={() => openImageEditor(editConfig.logo_base64, 'logo')}
+                        className="edit-image-btn"
+                        title="Editar Logo"
+                      >
+                        🎨 Editar Imagen
+                      </button>
                     </div>
                   )}
                 </div>

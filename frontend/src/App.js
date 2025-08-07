@@ -537,119 +537,130 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal-content admin-panel">
-        <div className="admin-header">
-          <h2>Panel de Administración</h2>
-          <button onClick={onClose} className="close-btn">×</button>
+    <div className="admin-panel">
+      <div className="panel-content">
+        {/* Header mejorado */}
+        <div className="panel-header">
+          <h1 className="panel-title">
+            <span className="panel-icon">⚙️</span>
+            Panel de Administración
+          </h1>
+          <button onClick={onClose} className="close-btn" title="Cerrar panel">
+            ✕
+          </button>
         </div>
         
-        <div className="admin-tabs">
+        {/* Navegación de pestañas estilo Bootstrap */}
+        <div className="panel-tabs">
           <button 
-            className={`tab ${activeTab === 'general' ? 'active' : ''}`}
+            className={`tab-button ${activeTab === 'general' ? 'active' : ''}`}
             onClick={() => setActiveTab('general')}
           >
+            <span className="tab-icon">🏠</span>
             General
           </button>
           <button 
-            className={`tab ${activeTab === 'textos' ? 'active' : ''}`}
+            className={`tab-button ${activeTab === 'textos' ? 'active' : ''}`}
             onClick={() => setActiveTab('textos')}
           >
+            <span className="tab-icon">📝</span>
             Textos
           </button>
           <button 
-            className={`tab ${activeTab === 'redes' ? 'active' : ''}`}
+            className={`tab-button ${activeTab === 'redes' ? 'active' : ''}`}
             onClick={() => setActiveTab('redes')}
           >
+            <span className="tab-icon">🌐</span>
             Redes Sociales
           </button>
           <button 
-            className={`tab ${activeTab === 'collections' ? 'active' : ''}`}
+            className={`tab-button ${activeTab === 'collections' ? 'active' : ''}`}
             onClick={() => setActiveTab('collections')}
           >
+            <span className="tab-icon">💎</span>
             Colecciones
           </button>
           <button 
-            className={`tab ${activeTab === 'jewelry' ? 'active' : ''}`}
+            className={`tab-button ${activeTab === 'jewelry' ? 'active' : ''}`}
             onClick={() => setActiveTab('jewelry')}
           >
+            <span className="tab-icon">💍</span>
             Joyas
           </button>
         </div>
 
-        <div className="admin-content">
+        {/* Contenido del panel */}
+        <div className="panel-body">
+          {/* Pestaña General */}
           {activeTab === 'general' && (
-            <div className="config-panel">
-              <h3>Configuración General</h3>
+            <div className="tab-content">
+              <div className="section-header">
+                <h2 className="section-title">Configuración General</h2>
+                <div className="section-actions">
+                  <button onClick={saveConfig} className={`btn-success ${isSaving ? 'loading' : ''}`} disabled={isSaving}>
+                    {isSaving ? 'Guardando...' : '💾 Guardar Cambios'}
+                  </button>
+                </div>
+              </div>
+              
               <div className="form-grid">
                 <div className="form-group">
-                  <label>Nombre del Sitio</label>
+                  <label className="form-label">Nombre del Sitio</label>
                   <input
                     type="text"
                     value={editConfig.site_name || ''}
                     onChange={(e) => setEditConfig({...editConfig, site_name: e.target.value})}
                     className="form-input"
+                    placeholder="Ej: AO Jewellery"
                   />
                 </div>
+                
                 <div className="form-group">
-                  <label>Nombre de la Artesana</label>
+                  <label className="form-label">Subtítulo del Sitio</label>
+                  <input
+                    type="text"
+                    value={editConfig.site_subtitle || ''}
+                    onChange={(e) => setEditConfig({...editConfig, site_subtitle: e.target.value})}
+                    className="form-input"
+                    placeholder="Ej: Joyería Artesanal de Lujo"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Nombre del Artesano</label>
                   <input
                     type="text"
                     value={editConfig.artisan_name || ''}
                     onChange={(e) => setEditConfig({...editConfig, artisan_name: e.target.value})}
                     className="form-input"
+                    placeholder="Tu nombre"
                   />
                 </div>
+
+                <div className="form-group">
+                  <label className="form-label">Contacto del Artesano</label>
+                  <input
+                    type="text"
+                    value={editConfig.artisan_contact || ''}
+                    onChange={(e) => setEditConfig({...editConfig, artisan_contact: e.target.value})}
+                    className="form-input"
+                    placeholder="Teléfono, email o dirección"
+                  />
+                </div>
+
                 <div className="form-group full-width">
-                  <label>Historia de la Artesana</label>
+                  <label className="form-label">Historia del Artesano</label>
                   <textarea
                     value={editConfig.artisan_story || ''}
                     onChange={(e) => setEditConfig({...editConfig, artisan_story: e.target.value})}
                     className="form-textarea"
+                    placeholder="Cuenta tu historia, experiencia y pasión por la joyería..."
                     rows="4"
                   />
                 </div>
-                <div className="form-group">
-                  <label>Email de Contacto</label>
-                  <input
-                    type="email"
-                    value={editConfig.artisan_contact || ''}
-                    onChange={(e) => setEditConfig({...editConfig, artisan_contact: e.target.value})}
-                    className="form-input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Teléfono</label>
-                  <input
-                    type="text"
-                    value={editConfig.artisan_phone || ''}
-                    onChange={(e) => setEditConfig({...editConfig, artisan_phone: e.target.value})}
-                    className="form-input"
-                  />
-                </div>
+
                 <div className="form-group full-width">
-                  <label>Dirección</label>
-                  <input
-                    type="text"
-                    value={editConfig.artisan_address || ''}
-                    onChange={(e) => setEditConfig({...editConfig, artisan_address: e.target.value})}
-                    className="form-input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Esquema de Color</label>
-                  <select
-                    value={editConfig.color_scheme || 'gold'}
-                    onChange={(e) => setEditConfig({...editConfig, color_scheme: e.target.value})}
-                    className="form-select"
-                  >
-                    <option value="gold">Dorado</option>
-                    <option value="silver">Plateado</option>
-                    <option value="rose">Rosa</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Logo</label>
+                  <label className="form-label">Logo del Sitio</label>
                   <input
                     type="file"
                     accept="image/*"
@@ -657,267 +668,218 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
                     className="form-input"
                   />
                   {editConfig.logo_base64 && (
-                    <img src={editConfig.logo_base64} alt="Logo preview" className="image-preview" />
+                    <div className="image-preview">
+                      <img src={editConfig.logo_base64} alt="Logo preview" className="preview-img" />
+                    </div>
                   )}
                 </div>
               </div>
-              <button onClick={saveConfig} className={`btn-primary ${isSaving ? 'loading' : ''}`} disabled={isSaving}>
-                {isSaving ? 'Guardando...' : 'Guardar Configuración General'}
-              </button>
             </div>
           )}
 
+          {/* Pestaña Textos */}
           {activeTab === 'textos' && (
-            <div className="config-panel">
-              <h3>Personalización de Textos</h3>
-              <div className="form-grid">
-                <div className="form-group">
-                  <label>Subtítulo del Sitio</label>
-                  <input
-                    type="text"
-                    value={editConfig.site_subtitle || ''}
-                    onChange={(e) => setEditConfig({...editConfig, site_subtitle: e.target.value})}
-                    className="form-input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Título del Hero</label>
-                  <input
-                    type="text"
-                    value={editConfig.hero_title || ''}
-                    onChange={(e) => setEditConfig({...editConfig, hero_title: e.target.value})}
-                    className="form-input"
-                  />
-                </div>
-                <div className="form-group full-width">
-                  <label>Descripción del Hero</label>
-                  <textarea
-                    value={editConfig.hero_description || ''}
-                    onChange={(e) => setEditConfig({...editConfig, hero_description: e.target.value})}
-                    className="form-textarea"
-                    rows="3"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Título de Colecciones</label>
-                  <input
-                    type="text"
-                    value={editConfig.collections_title || ''}
-                    onChange={(e) => setEditConfig({...editConfig, collections_title: e.target.value})}
-                    className="form-input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Subtítulo de Colecciones</label>
-                  <input
-                    type="text"
-                    value={editConfig.collections_subtitle || ''}
-                    onChange={(e) => setEditConfig({...editConfig, collections_subtitle: e.target.value})}
-                    className="form-input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Título Footer 1</label>
-                  <input
-                    type="text"
-                    value={editConfig.footer_title_1 || ''}
-                    onChange={(e) => setEditConfig({...editConfig, footer_title_1: e.target.value})}
-                    className="form-input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Título Footer 2</label>
-                  <input
-                    type="text"
-                    value={editConfig.footer_title_2 || ''}
-                    onChange={(e) => setEditConfig({...editConfig, footer_title_2: e.target.value})}
-                    className="form-input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Título Footer 3</label>
-                  <input
-                    type="text"
-                    value={editConfig.footer_title_3 || ''}
-                    onChange={(e) => setEditConfig({...editConfig, footer_title_3: e.target.value})}
-                    className="form-input"
-                  />
-                </div>
-                <div className="form-group full-width">
-                  <label>Texto Footer 3</label>
-                  <textarea
-                    value={editConfig.footer_text_3 || ''}
-                    onChange={(e) => setEditConfig({...editConfig, footer_text_3: e.target.value})}
-                    className="form-textarea"
-                    rows="2"
-                  />
-                </div>
-                <div className="form-group full-width">
-                  <label>Texto Copyright</label>
-                  <input
-                    type="text"
-                    value={editConfig.footer_copyright || ''}
-                    onChange={(e) => setEditConfig({...editConfig, footer_copyright: e.target.value})}
-                    className="form-input"
-                  />
+            <div className="tab-content">
+              <div className="section-header">
+                <h2 className="section-title">Textos del Sitio</h2>
+                <div className="section-actions">
+                  <button onClick={saveConfig} className={`btn-success ${isSaving ? 'loading' : ''}`} disabled={isSaving}>
+                    {isSaving ? 'Guardando...' : '💾 Guardar Cambios'}
+                  </button>
                 </div>
               </div>
-              <button onClick={saveConfig} className={`btn-primary ${isSaving ? 'loading' : ''}`} disabled={isSaving}>
-                {isSaving ? 'Guardando...' : 'Guardar Textos Personalizados'}
-              </button>
+
+              <div className="form-sections">
+                <div className="form-section">
+                  <h3 className="form-section-title">Sección Hero</h3>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label">Título Principal</label>
+                      <input
+                        type="text"
+                        value={editConfig.hero_title || ''}
+                        onChange={(e) => setEditConfig({...editConfig, hero_title: e.target.value})}
+                        className="form-input"
+                        placeholder="Título de la sección hero"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Descripción</label>
+                      <textarea
+                        value={editConfig.hero_description || ''}
+                        onChange={(e) => setEditConfig({...editConfig, hero_description: e.target.value})}
+                        className="form-textarea"
+                        placeholder="Descripción de la sección hero"
+                        rows="3"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-section">
+                  <h3 className="form-section-title">Sección Colecciones</h3>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="form-label">Título de Colecciones</label>
+                      <input
+                        type="text"
+                        value={editConfig.collections_title || ''}
+                        onChange={(e) => setEditConfig({...editConfig, collections_title: e.target.value})}
+                        className="form-input"
+                        placeholder="Ej: Nuestras Colecciones"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Subtítulo de Colecciones</label>
+                      <input
+                        type="text"
+                        value={editConfig.collections_subtitle || ''}
+                        onChange={(e) => setEditConfig({...editConfig, collections_subtitle: e.target.value})}
+                        className="form-input"
+                        placeholder="Subtítulo descriptivo"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-section">
+                  <h3 className="form-section-title">Footer</h3>
+                  <div className="form-grid">
+                    <div className="form-group">
+                      <label className="form-label">Título Footer 1</label>
+                      <input
+                        type="text"
+                        value={editConfig.footer_title_1 || ''}
+                        onChange={(e) => setEditConfig({...editConfig, footer_title_1: e.target.value})}
+                        className="form-input"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Título Footer 2</label>
+                      <input
+                        type="text"
+                        value={editConfig.footer_title_2 || ''}
+                        onChange={(e) => setEditConfig({...editConfig, footer_title_2: e.target.value})}
+                        className="form-input"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Título Footer 3</label>
+                      <input
+                        type="text"
+                        value={editConfig.footer_title_3 || ''}
+                        onChange={(e) => setEditConfig({...editConfig, footer_title_3: e.target.value})}
+                        className="form-input"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Texto Footer 3</label>
+                      <textarea
+                        value={editConfig.footer_text_3 || ''}
+                        onChange={(e) => setEditConfig({...editConfig, footer_text_3: e.target.value})}
+                        className="form-textarea"
+                        rows="3"
+                      />
+                    </div>
+                    <div className="form-group full-width">
+                      <label className="form-label">Copyright</label>
+                      <input
+                        type="text"
+                        value={editConfig.footer_copyright || ''}
+                        onChange={(e) => setEditConfig({...editConfig, footer_copyright: e.target.value})}
+                        className="form-input"
+                        placeholder="© 2025 Tu Empresa"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
+          {/* Pestaña Redes Sociales */}
           {activeTab === 'redes' && (
-            <div className="config-panel">
-              <h3>Redes Sociales</h3>
-              <div className="form-grid">
-                <div className="form-group social-group">
-                  <label className="social-label">
-                    <input
-                      type="checkbox"
-                      checked={editConfig.social_facebook_enabled || false}
-                      onChange={(e) => setEditConfig({...editConfig, social_facebook_enabled: e.target.checked})}
-                    />
-                    Facebook
-                  </label>
-                  <input
-                    type="url"
-                    placeholder="https://facebook.com/tupagina"
-                    value={editConfig.social_facebook || ''}
-                    onChange={(e) => setEditConfig({...editConfig, social_facebook: e.target.value})}
-                    className="form-input"
-                    disabled={!editConfig.social_facebook_enabled}
-                  />
-                </div>
-                <div className="form-group social-group">
-                  <label className="social-label">
-                    <input
-                      type="checkbox"
-                      checked={editConfig.social_instagram_enabled || false}
-                      onChange={(e) => setEditConfig({...editConfig, social_instagram_enabled: e.target.checked})}
-                    />
-                    Instagram
-                  </label>
-                  <input
-                    type="url"
-                    placeholder="https://instagram.com/tuusuario"
-                    value={editConfig.social_instagram || ''}
-                    onChange={(e) => setEditConfig({...editConfig, social_instagram: e.target.value})}
-                    className="form-input"
-                    disabled={!editConfig.social_instagram_enabled}
-                  />
-                </div>
-                <div className="form-group social-group">
-                  <label className="social-label">
-                    <input
-                      type="checkbox"
-                      checked={editConfig.social_tiktok_enabled || false}
-                      onChange={(e) => setEditConfig({...editConfig, social_tiktok_enabled: e.target.checked})}
-                    />
-                    TikTok
-                  </label>
-                  <input
-                    type="url"
-                    placeholder="https://tiktok.com/@tuusuario"
-                    value={editConfig.social_tiktok || ''}
-                    onChange={(e) => setEditConfig({...editConfig, social_tiktok: e.target.value})}
-                    className="form-input"
-                    disabled={!editConfig.social_tiktok_enabled}
-                  />
-                </div>
-                <div className="form-group social-group">
-                  <label className="social-label">
-                    <input
-                      type="checkbox"
-                      checked={editConfig.social_whatsapp_enabled || false}
-                      onChange={(e) => setEditConfig({...editConfig, social_whatsapp_enabled: e.target.checked})}
-                    />
-                    WhatsApp
-                  </label>
-                  <input
-                    type="tel"
-                    placeholder="+34600000000"
-                    value={editConfig.social_whatsapp || ''}
-                    onChange={(e) => setEditConfig({...editConfig, social_whatsapp: e.target.value})}
-                    className="form-input"
-                    disabled={!editConfig.social_whatsapp_enabled}
-                  />
-                </div>
-                <div className="form-group social-group">
-                  <label className="social-label">
-                    <input
-                      type="checkbox"
-                      checked={editConfig.social_youtube_enabled || false}
-                      onChange={(e) => setEditConfig({...editConfig, social_youtube_enabled: e.target.checked})}
-                    />
-                    YouTube
-                  </label>
-                  <input
-                    type="url"
-                    placeholder="https://youtube.com/c/tucanal"
-                    value={editConfig.social_youtube || ''}
-                    onChange={(e) => setEditConfig({...editConfig, social_youtube: e.target.value})}
-                    className="form-input"
-                    disabled={!editConfig.social_youtube_enabled}
-                  />
-                </div>
-                <div className="form-group social-group">
-                  <label className="social-label">
-                    <input
-                      type="checkbox"
-                      checked={editConfig.social_twitter_enabled || false}
-                      onChange={(e) => setEditConfig({...editConfig, social_twitter_enabled: e.target.checked})}
-                    />
-                    Twitter/X
-                  </label>
-                  <input
-                    type="url"
-                    placeholder="https://twitter.com/tuusuario"
-                    value={editConfig.social_twitter || ''}
-                    onChange={(e) => setEditConfig({...editConfig, social_twitter: e.target.value})}
-                    className="form-input"
-                    disabled={!editConfig.social_twitter_enabled}
-                  />
+            <div className="tab-content">
+              <div className="section-header">
+                <h2 className="section-title">Redes Sociales</h2>
+                <div className="section-actions">
+                  <button onClick={saveConfig} className={`btn-success ${isSaving ? 'loading' : ''}`} disabled={isSaving}>
+                    {isSaving ? 'Guardando...' : '💾 Guardar Cambios'}
+                  </button>
                 </div>
               </div>
-              <button onClick={saveConfig} className={`btn-primary ${isSaving ? 'loading' : ''}`} disabled={isSaving}>
-                {isSaving ? 'Guardando...' : 'Guardar Redes Sociales'}
-              </button>
+
+              <div className="social-grid">
+                {[
+                  { key: 'facebook', icon: '📘', name: 'Facebook' },
+                  { key: 'instagram', icon: '📷', name: 'Instagram' },
+                  { key: 'tiktok', icon: '🎵', name: 'TikTok' },
+                  { key: 'whatsapp', icon: '💬', name: 'WhatsApp' },
+                  { key: 'youtube', icon: '📺', name: 'YouTube' },
+                  { key: 'twitter', icon: '🐦', name: 'Twitter/X' }
+                ].map(social => (
+                  <div key={social.key} className="social-item">
+                    <div className="social-header">
+                      <span className="social-icon">{social.icon}</span>
+                      <h4 className="social-name">{social.name}</h4>
+                      <div className="form-check">
+                        <input
+                          type="checkbox"
+                          id={`${social.key}_enabled`}
+                          checked={editConfig[`social_${social.key}_enabled`] || false}
+                          onChange={(e) => setEditConfig({...editConfig, [`social_${social.key}_enabled`]: e.target.checked})}
+                          className="form-check-input"
+                        />
+                        <label htmlFor={`${social.key}_enabled`} className="form-check-label">Activar</label>
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <input
+                        type="url"
+                        value={editConfig[`social_${social.key}`] || ''}
+                        onChange={(e) => setEditConfig({...editConfig, [`social_${social.key}`]: e.target.value})}
+                        className="form-input"
+                        placeholder={`URL de ${social.name}`}
+                        disabled={!editConfig[`social_${social.key}_enabled`]}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
+          {/* Pestaña Colecciones */}
           {activeTab === 'collections' && (
-            <div className="collections-panel">
-              <div className="panel-header">
-                <h3>Gestión de Colecciones</h3>
-                <button 
-                  onClick={() => setEditingCollection({...newCollection})}
-                  className="btn-primary"
-                >
-                  Nueva Colección
-                </button>
+            <div className="tab-content">
+              <div className="section-header">
+                <h2 className="section-title">Gestión de Colecciones</h2>
+                <div className="section-actions">
+                  <button onClick={() => setEditingCollection({ name: '', description: '', image_base64: '', position: collections.length })} className="btn-primary">
+                    ➕ Nueva Colección
+                  </button>
+                </div>
               </div>
-              
-              <div className="collections-grid">
+
+              <div className="items-grid">
                 {collections.map(collection => (
-                  <div key={collection.id} className="collection-card-admin">
-                    <img src={collection.image_base64} alt={collection.name} className="collection-image-admin" />
-                    <div className="collection-info">
-                      <h4>{collection.name}</h4>
-                      <p>{collection.description}</p>
-                      <div className="collection-actions">
-                        <button 
-                          onClick={() => setEditingCollection(collection)}
-                          className="btn-secondary"
-                        >
-                          Editar
+                  <div key={collection.id} className="item-card">
+                    <div className="item-image">
+                      {collection.image_base64 ? (
+                        <img src={collection.image_base64} alt={collection.name} />
+                      ) : (
+                        <div className="placeholder-image">📷</div>
+                      )}
+                    </div>
+                    <div className="item-content">
+                      <h4 className="item-title">{collection.name}</h4>
+                      <p className="item-description">{collection.description}</p>
+                      <div className="item-actions">
+                        <button onClick={() => setEditingCollection(collection)} className="btn-secondary btn-sm">
+                          ✏️ Editar
                         </button>
-                        <button 
-                          onClick={() => deleteCollection(collection.id)}
-                          className="btn-danger"
-                        >
-                          Eliminar
+                        <button onClick={() => deleteCollection(collection.id)} className="btn-danger btn-sm">
+                          🗑️ Eliminar
                         </button>
                       </div>
                     </div>
@@ -925,46 +887,54 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
                 ))}
               </div>
 
+              {/* Modal de edición de colección */}
               {editingCollection && (
-                <div className="edit-modal">
-                  <div className="edit-content">
-                    <h4>{editingCollection.id ? 'Editar Colección' : 'Nueva Colección'}</h4>
-                    <div className="form-group">
-                      <label>Nombre</label>
-                      <input
-                        type="text"
-                        value={editingCollection.name || ''}
-                        onChange={(e) => setEditingCollection({...editingCollection, name: e.target.value})}
-                        className="form-input"
-                      />
+                <div className="modal-overlay">
+                  <div className="modal-dialog">
+                    <div className="modal-header">
+                      <h3>{editingCollection.id ? 'Editar Colección' : 'Nueva Colección'}</h3>
+                      <button onClick={() => setEditingCollection(null)} className="btn-close">✕</button>
                     </div>
-                    <div className="form-group">
-                      <label>Descripción</label>
-                      <textarea
-                        value={editingCollection.description || ''}
-                        onChange={(e) => setEditingCollection({...editingCollection, description: e.target.value})}
-                        className="form-textarea"
-                        rows="3"
-                      />
+                    <div className="modal-body">
+                      <div className="form-group">
+                        <label className="form-label">Nombre</label>
+                        <input
+                          type="text"
+                          value={editingCollection.name}
+                          onChange={(e) => setEditingCollection({...editingCollection, name: e.target.value})}
+                          className="form-input"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Descripción</label>
+                        <textarea
+                          value={editingCollection.description}
+                          onChange={(e) => setEditingCollection({...editingCollection, description: e.target.value})}
+                          className="form-textarea"
+                          rows="3"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Imagen</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleImageUpload(e, (base64) => setEditingCollection({...editingCollection, image_base64: base64}))}
+                          className="form-input"
+                        />
+                        {editingCollection.image_base64 && (
+                          <div className="image-preview">
+                            <img src={editingCollection.image_base64} alt="Preview" className="preview-img" />
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="form-group">
-                      <label>Imagen</label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleImageUpload(e, (base64) => setEditingCollection({...editingCollection, image_base64: base64}))}
-                        className="form-input"
-                      />
-                      {editingCollection.image_base64 && (
-                        <img src={editingCollection.image_base64} alt="Preview" className="image-preview" />
-                      )}
-                    </div>
-                    <div className="form-actions">
-                      <button onClick={() => saveCollection(editingCollection)} className="btn-primary">
-                        Guardar
-                      </button>
+                    <div className="modal-footer">
                       <button onClick={() => setEditingCollection(null)} className="btn-secondary">
                         Cancelar
+                      </button>
+                      <button onClick={() => saveCollection(editingCollection)} className="btn-success">
+                        Guardar
                       </button>
                     </div>
                   </div>
@@ -973,38 +943,42 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
             </div>
           )}
 
+          {/* Pestaña Joyas */}
           {activeTab === 'jewelry' && (
-            <div className="jewelry-panel">
-              <div className="panel-header">
-                <h3>Gestión de Joyas</h3>
-                <button 
-                  onClick={() => setEditingJewelry({...newJewelry})}
-                  className="btn-primary"
-                >
-                  Nueva Joya
-                </button>
+            <div className="tab-content">
+              <div className="section-header">
+                <h2 className="section-title">Gestión de Joyas</h2>
+                <div className="section-actions">
+                  <button onClick={() => setEditingJewelry({ name: '', description: '', image_base64: '', collection_id: '', position: jewelryItems.length })} className="btn-primary">
+                    ➕ Nueva Joya
+                  </button>
+                </div>
               </div>
-              
-              <div className="jewelry-grid">
+
+              <div className="items-grid">
                 {jewelryItems.map(jewelry => (
-                  <div key={jewelry.id} className="jewelry-card-admin">
-                    <img src={jewelry.image_base64} alt={jewelry.name} className="jewelry-image-admin" />
-                    <div className="jewelry-info">
-                      <h4>{jewelry.name}</h4>
-                      <p>{jewelry.description}</p>
-                      <small>Colección: {collections.find(c => c.id === jewelry.collection_id)?.name}</small>
-                      <div className="jewelry-actions">
-                        <button 
-                          onClick={() => setEditingJewelry(jewelry)}
-                          className="btn-secondary"
-                        >
-                          Editar
+                  <div key={jewelry.id} className="item-card">
+                    <div className="item-image">
+                      {jewelry.image_base64 ? (
+                        <img src={jewelry.image_base64} alt={jewelry.name} />
+                      ) : (
+                        <div className="placeholder-image">💍</div>
+                      )}
+                    </div>
+                    <div className="item-content">
+                      <h4 className="item-title">{jewelry.name}</h4>
+                      <p className="item-description">{jewelry.description}</p>
+                      <div className="item-meta">
+                        <span className="item-collection">
+                          {collections.find(c => c.id === jewelry.collection_id)?.name || 'Sin colección'}
+                        </span>
+                      </div>
+                      <div className="item-actions">
+                        <button onClick={() => setEditingJewelry(jewelry)} className="btn-secondary btn-sm">
+                          ✏️ Editar
                         </button>
-                        <button 
-                          onClick={() => deleteJewelry(jewelry.id)}
-                          className="btn-danger"
-                        >
-                          Eliminar
+                        <button onClick={() => deleteJewelry(jewelry.id)} className="btn-danger btn-sm">
+                          🗑️ Eliminar
                         </button>
                       </div>
                     </div>
@@ -1012,61 +986,71 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
                 ))}
               </div>
 
+              {/* Modal de edición de joya */}
               {editingJewelry && (
-                <div className="edit-modal">
-                  <div className="edit-content">
-                    <h4>{editingJewelry.id ? 'Editar Joya' : 'Nueva Joya'}</h4>
-                    <div className="form-group">
-                      <label>Nombre</label>
-                      <input
-                        type="text"
-                        value={editingJewelry.name || ''}
-                        onChange={(e) => setEditingJewelry({...editingJewelry, name: e.target.value})}
-                        className="form-input"
-                      />
+                <div className="modal-overlay">
+                  <div className="modal-dialog">
+                    <div className="modal-header">
+                      <h3>{editingJewelry.id ? 'Editar Joya' : 'Nueva Joya'}</h3>
+                      <button onClick={() => setEditingJewelry(null)} className="btn-close">✕</button>
                     </div>
-                    <div className="form-group">
-                      <label>Descripción</label>
-                      <textarea
-                        value={editingJewelry.description || ''}
-                        onChange={(e) => setEditingJewelry({...editingJewelry, description: e.target.value})}
-                        className="form-textarea"
-                        rows="3"
-                      />
+                    <div className="modal-body">
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label className="form-label">Nombre</label>
+                          <input
+                            type="text"
+                            value={editingJewelry.name}
+                            onChange={(e) => setEditingJewelry({...editingJewelry, name: e.target.value})}
+                            className="form-input"
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label className="form-label">Colección</label>
+                          <select
+                            value={editingJewelry.collection_id}
+                            onChange={(e) => setEditingJewelry({...editingJewelry, collection_id: e.target.value})}
+                            className="form-select"
+                          >
+                            <option value="">Seleccionar colección</option>
+                            {collections.map(collection => (
+                              <option key={collection.id} value={collection.id}>
+                                {collection.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Descripción</label>
+                        <textarea
+                          value={editingJewelry.description}
+                          onChange={(e) => setEditingJewelry({...editingJewelry, description: e.target.value})}
+                          className="form-textarea"
+                          rows="3"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Imagen</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleImageUpload(e, (base64) => setEditingJewelry({...editingJewelry, image_base64: base64}))}
+                          className="form-input"
+                        />
+                        {editingJewelry.image_base64 && (
+                          <div className="image-preview">
+                            <img src={editingJewelry.image_base64} alt="Preview" className="preview-img" />
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="form-group">
-                      <label>Colección</label>
-                      <select
-                        value={editingJewelry.collection_id || ''}
-                        onChange={(e) => setEditingJewelry({...editingJewelry, collection_id: e.target.value})}
-                        className="form-select"
-                      >
-                        <option value="">Seleccionar colección</option>
-                        {collections.map(collection => (
-                          <option key={collection.id} value={collection.id}>
-                            {collection.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label>Imagen</label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleImageUpload(e, (base64) => setEditingJewelry({...editingJewelry, image_base64: base64}))}
-                        className="form-input"
-                      />
-                      {editingJewelry.image_base64 && (
-                        <img src={editingJewelry.image_base64} alt="Preview" className="image-preview" />
-                      )}
-                    </div>
-                    <div className="form-actions">
-                      <button onClick={() => saveJewelry(editingJewelry)} className="btn-primary">
-                        Guardar
-                      </button>
+                    <div className="modal-footer">
                       <button onClick={() => setEditingJewelry(null)} className="btn-secondary">
                         Cancelar
+                      </button>
+                      <button onClick={() => saveJewelry(editingJewelry)} className="btn-success">
+                        Guardar
                       </button>
                     </div>
                   </div>

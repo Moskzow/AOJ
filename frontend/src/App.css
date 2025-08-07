@@ -2434,7 +2434,16 @@ body {
   }
   
   .admin-panel {
+    padding: 1rem;
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  .panel-content {
+    width: 95%;
+    max-width: none;
     max-height: 95vh;
+    border-radius: 15px;
   }
   
   .admin-header,

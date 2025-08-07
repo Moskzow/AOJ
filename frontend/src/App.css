@@ -1221,11 +1221,7 @@ body {
   .editor-actions button {
     width: 100%;
   }
-}
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
+
 
 .editor-header {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);

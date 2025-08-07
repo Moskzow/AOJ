@@ -915,6 +915,30 @@ const AdminPanel = ({ isOpen, onClose, siteConfig, onConfigUpdate, collections, 
                       />
                     </div>
                   </div>
+                  
+                  {/* Campo para imagen/video del Hero */}
+                  <div className="form-group full-width">
+                    <label className="form-label">Imagen de Fondo del Hero</label>
+                    <input
+                      type="file"
+                      accept="image/*,video/*"
+                      onChange={(e) => handleImageUpload(e, (base64) => setEditConfig({...editConfig, hero_image_base64: base64}))}
+                      className="form-input"
+                    />
+                    {editConfig.hero_image_base64 && (
+                      <div className="image-preview">
+                        <img src={editConfig.hero_image_base64} alt="Hero background preview" className="preview-img" />
+                        <button
+                          type="button"
+                          onClick={() => openImageEditor(editConfig.hero_image_base64, 'hero')}
+                          className="edit-image-btn"
+                          title="Editar Imagen del Hero"
+                        >
+                          🎨 Editar Imagen
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="form-section">
